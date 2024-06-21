@@ -3,7 +3,8 @@ import { Toaster } from "react-hot-toast";
 import { useState } from "react";
 
 
-import { HomePage, RegisterPage, LoginPage, Blogs } from "./pages/";
+import { HomePage, RegisterPage, LoginPage, Financials, UploadFile } from "./pages/";
+import { MainLayout } from "./layouts/MainLayout";
 
 import { Mycontext } from "./store/CreateContext";
 import { Privateroutes } from "./feature/PrivateRoutes";
@@ -17,20 +18,20 @@ function App() {
   return (
     <>
       <Mycontext.Provider value={{ userName, setUserName, userEmail, setUserEmail, userId, setUserId }}>
-        <div>
-          <Routes>
+        <Routes>
+          <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
 
-            <Route path="/blogs/" element={<Privateroutes />} >
-              <Route path="/blogs/" element={<Blogs />} />
-              { /*<Route path="/blogs/:id" element={<ArticleDetailPage />} />*/}
+            <Route element={<Privateroutes />}>
+              <Route path="/table" element={<Financials />} />
+              <Route path="/uploadfile" element={<UploadFile />} />
             </Route>
+          </Route>
 
-            <Route path="/register" element={<RegisterPage />} />
-            <Route path="/login" element={<LoginPage />} />
-          </Routes>
-          <Toaster />
-        </div>
+          <Route path="/register" element={<RegisterPage />} />
+          <Route path="/login" element={<LoginPage />} />
+        </Routes>
+        <Toaster />
       </Mycontext.Provider>
     </>
   );

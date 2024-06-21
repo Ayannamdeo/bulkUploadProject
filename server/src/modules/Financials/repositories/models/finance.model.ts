@@ -8,7 +8,7 @@ const financeSchema: mongoose.Schema<IFinance> = new mongoose.Schema<IFinance>(
     age: { type: Number, min: 18, max: 75, required: true },
     sex: { type: String, enum: ["male", "female"], required: true },
     city: { type: String, required: true },
-    accountNumber: { type: Number, required: true },
+    accountNumber: { type: String, required: true },
     accountName: { type: String, required: true },
     amount: { type: String, required: true },
     currencyName: {

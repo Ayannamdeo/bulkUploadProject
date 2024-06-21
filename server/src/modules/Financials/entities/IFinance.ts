@@ -3,7 +3,7 @@ interface IFinance {
   age: number;
   sex: string;
   city: string;
-  accountNumber: number;
+  accountNumber: string;
   accountName: string;
   amount: string;
   currencyName: string;

@@ -6,9 +6,9 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.BULK_UPLOAD_REPORT = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const bulkUploadSchema = new mongoose_1.default.Schema({
-    uploadId: { type: String, required: true },
-    startTime: { type: Date, required: true },
-    endTime: { type: Date, required: true },
+    uploadId: { type: String, required: true, unique: true },
+    startTime: { type: String, required: true },
+    endTime: { type: String, required: true },
     fileName: { type: String, required: true },
     totalEntries: { type: Number, required: true },
     successfulEntries: { type: Number, required: true },

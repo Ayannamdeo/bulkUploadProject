@@ -4,9 +4,9 @@ import mongoose from "mongoose";
 const bulkUploadSchema: mongoose.Schema<IBulkUpload> =
   new mongoose.Schema<IBulkUpload>(
     {
-      uploadId: { type: String, required: true },
-      startTime: { type: Date, required: true },
-      endTime: { type: Date, required: true },
+      uploadId: { type: String, required: true, unique: true },
+      startTime: { type: String, required: true },
+      endTime: { type: String, required: true },
       fileName: { type: String, required: true },
       totalEntries: { type: Number, required: true },
       successfulEntries: { type: Number, required: true },

@@ -1,7 +1,6 @@
 import { ErrorMessage } from "./ErrorMessage";
-import { Footer } from "./Footer";
-import { Header } from "./Header";
-import { MainLayout } from "./MainLayout";
+import { Sidebar } from "./Sidebar";
 import { SkeletonArticleCard } from "./SkeletonArticleCard";
+import { TopNavbar } from "./TopNavbar";
 
-export { ErrorMessage, Footer, Header, MainLayout, SkeletonArticleCard };
+export { ErrorMessage, Sidebar, SkeletonArticleCard, TopNavbar };

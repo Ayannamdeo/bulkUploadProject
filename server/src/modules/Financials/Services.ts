@@ -4,7 +4,7 @@ import fs from "fs";
 import { IFinance, IBulkError, IBulkUpload } from "./entities";
 import { FinancialRepository } from "./repositories/Repository";
 import { CsvDataValidation } from "../../lib/middlewares/csvDataValidation";
-import { abort } from "process";
+import { logger } from "../../lib/helpers/logger";
 
 class FinancialServices {
   private readonly financialRepository: FinancialRepository;
@@ -13,10 +13,23 @@ class FinancialServices {
     this.financialRepository = new FinancialRepository();
   }
 
-  getAllFinancials = async (): Promise<IFinance[] | null> => {
-    return await this.financialRepository.getAll();
+  getAllFinancials = async (
+    page: number = 1,
+    limit: number = 10,
+    sortBy: string = "createdAt",
+    sortDirection: string = "desc",
+  ): Promise<IFinance[] | null> => {
+    return await this.financialRepository.getAll(
+      page,
+      limit,
+      sortBy,
+      sortDirection,
+    );
   };
 
+  countAllFinancials = async (): Promise<number> => {
+    return await this.financialRepository.countAll();
+  };
   private static transformEntry = (csvRowData: any): IFinance => {
     const transformedRow = {
       name: csvRowData.name,
@@ -33,10 +46,11 @@ class FinancialServices {
 
   private static validateEntries = async (
     entries: IFinance[],
+    uploadId: string,
   ): Promise<{ passed: IFinance[]; failed: IBulkError[] }> => {
     const passed: IFinance[] = [];
     const failed: IBulkError[] = [];
-    const uploadId = new Date().getTime().toString();
+    // const uploadId = new Date().getTime().toString();
 
     entries.forEach((entry: any, index: number) => {
       const { error } = CsvDataValidation.FinancialDetailSchema.validate(
@@ -57,34 +71,92 @@ class FinancialServices {
     return { passed, failed };
   };
 
-  private processInChunks = async (data: IFinance[]): Promise<void> => {
-    const chunkSize = 100000;
-    const totalSize = data.length;
+  private processInBatch = async (
+    batch: IFinance[],
+    uploadId: string,
+  ): Promise<{ passedCount: number; failedCount: number }> => {
+    try {
+      const { passed, failed } = await FinancialServices.validateEntries(
+        batch,
+        uploadId,
+      );
+      await this.financialRepository.uploadCsv(passed);
+      if (failed.length > 0) {
+        await this.financialRepository.uploadErrors(failed);
+      }
 
-    for (let i = 0; i < totalSize; i += chunkSize) {
-      const chunk = data.slice(i, i + chunkSize);
-      await this.financialRepository.uploadCsv(chunk);
+      return { passedCount: passed.length, failedCount: failed.length };
+    } catch (error: any) {
+      logger.error("error while processing batch: ", error);
+      return { passedCount: 0, failedCount: 0 };
     }
   };
 
   uploadCsvFile = async (fileName: string, filePath: string): Promise<any> => {
-    const dataToInsert: any[] = [];
-    const startTime: string = new Date().toLocaleString();
+    const batchSize = 10000;
+    let currentBatch: IFinance[] = [];
 
-    fs.createReadStream(filePath)
+    const uploadId = new Date().getTime().toString();
+    const startTime: string = new Date().toLocaleString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+      hour: "numeric",
+      minute: "numeric",
+      second: "numeric",
+    });
+    let successfulEntries = 0;
+    let failedEntries = 0;
+    const csvStream = fs
+      .createReadStream(filePath)
       .pipe(parse({ headers: true }))
-      .on("error", (error) => console.log(error))
-      .on("data", (row) => {
+      .on("error", (error) => logger.error(" .on(error): ", error))
+      .on("data", async (row) => {
         const transformedData = FinancialServices.transformEntry(row);
-        dataToInsert.push(transformedData);
-        console.log("inside createStream parsing the rows: ", transformedData);
+        currentBatch.push(transformedData);
+
+        if (currentBatch.length >= batchSize) {
+          csvStream.pause();
+          const { passedCount, failedCount } = await this.processInBatch(
+            currentBatch,
+            uploadId,
+          );
+          successfulEntries += passedCount;
+          failedEntries += failedCount;
+          currentBatch = [];
+          csvStream.resume();
+        }
       })
       .on("end", async (rowCount: number) => {
-        const { passed, failed } =
-          await FinancialServices.validateEntries(dataToInsert);
-        const reponse: any = await this.processInChunks(passed);
+        const totalEntries = rowCount;
+        if (currentBatch.length > 0) {
+          const { passedCount, failedCount } = await this.processInBatch(
+            currentBatch,
+            uploadId,
+          );
+          successfulEntries += passedCount;
+          failedEntries += failedCount;
+        }
+        fs.unlinkSync(filePath);
+        const endTime: string = new Date().toLocaleString(undefined, {
+          year: "numeric",
+          month: "short",
+          day: "numeric",
+          hour: "numeric",
+          minute: "numeric",
+          second: "numeric",
+        });
+        await this.financialRepository.uploadBulkUploadReport({
+          uploadId: uploadId,
+          startTime: startTime,
+          endTime: endTime,
+          fileName: fileName,
+          totalEntries: totalEntries,
+          successfulEntries: successfulEntries,
+          failedEntries: failedEntries,
+        });
 
-        console.log(`Parsed ${rowCount} rows`);
+        logger.info(`Parsed ${rowCount} rows`);
       });
   };
 }
