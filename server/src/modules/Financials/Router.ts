@@ -23,6 +23,20 @@ class Financials_Router_Class {
 
   private setupRoutes(): void {
     this.router.get("/", this.financialControllers.getAllData);
+    this.router.get("/search", this.financialControllers.searchData);
+    this.router.post("/", this.financialControllers.createData);
+    this.router.patch("/:id", this.financialControllers.updateData);
+    this.router.delete("/:id", this.financialControllers.deleteData);
+
+    this.router.get(
+      "/filereport",
+      this.financialControllers.getAllBulkUploadReportData,
+    );
+    this.router.get(
+      "/errorreport",
+      this.financialControllers.getAllErrorReportData,
+    );
+
     this.router.post(
       "/upload",
       upload.single("csvfile"),

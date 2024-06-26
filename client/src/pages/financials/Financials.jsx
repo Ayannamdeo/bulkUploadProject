@@ -1,18 +1,53 @@
 import { useMemo, useEffect, useState } from 'react';
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { toast } from "react-hot-toast";
+
 import { getColumns } from './container/getColumns';
-import { GlobalSearch, PageSizeMenu, PaginationNav, TableComponent } from './container';
-import { getFinancialData } from '../../services/financials';
+import { GlobalSearch, CurrencyFilter, AccountNameFilter, AddFinancial, EditFinancial, ViewFinancial } from './container';
+import { Modal, TableComponent, PageSizeMenu, PaginationNav } from '../../components';
+import { getFinancialData, deleteFinancialData } from '../../services/financials';
+import useModal from '../../hooks/useModal';
 
 const FinancialsTable = () => {
-  // const [data, setData] = useState([]);
+  const queryClient = useQueryClient();
+
   const [pageIndex, setPageIndex] = useState(0);
   const [pageSize, setPageSize] = useState(10);
-  // const [totalPages, setTotalPages] = useState(0);
   const [sortBy, setSortBy] = useState({ id: 'createdAt', desc: true }); // Initial sorting by createdAt in descending order
   const [globalFilter, setGlobalFilter] = useState('');
+  const [currencyFilter, setCurrencyFilter] = useState('');
+  const [accountNameFilter, setAccountNameFilter] = useState('');
 
-  const columns = useMemo(getColumns, []);
+  const { selectedRow, isModalOpen, openModal, closeModal } = useModal();
+  const [modalType, setModalType] = useState(null);
+
+  // const handleAdd = () => {
+  //     setModalType('add');
+  //     openModal();
+  //   };
+
+  const handleView = (row) => {
+    setModalType('view');
+    openModal(row);
+  };
+
+  const handleEdit = (row) => {
+    setModalType('edit');
+    openModal(row);
+  };
+
+  const handleDelete = (row) => {
+    console.log("Deleting row: ", row);
+    deleteMutation.mutate(row._id);
+  };
+
+  const handleSave = (newData) => {
+    // Add logic to save new or updated data
+    console.log('Saving data:', newData);
+    closeModal();
+  };
+
+  const columns = useMemo(() => getColumns(handleView, handleEdit, handleDelete), []);
 
   const { data: fetchedData, isLoading, isError, error, refetch } = useQuery({
     queryKey: ['financials', pageIndex, pageSize, sortBy],
@@ -21,24 +56,31 @@ const FinancialsTable = () => {
       size: pageSize,
       sortBy: sortBy.id,
       sortDirection: sortBy.desc === null ? null : (sortBy.desc ? 'desc' : 'asc'),
-      globalFilter
+      globalFilter,
+      currencyFilter,
+      accountNameFilter
     }),
     retry: false,
     keepPreviousData: true,
-    // onSuccess: (data) => {
-    //   console.log("data after onSuccess: ", data);
-    //   setData(data.financials);
-    //   setTotalPages(data.totalPages);
-    //   console.log("data after setData inside onSuccess: ", data);
-    // }
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => deleteFinancialData(id),
+    onSuccess: () => {
+      toast.success("Record Deleted Successfully");
+      queryClient.invalidateQueries('financials');
+      closeModal();
+    },
+    onError: (error) => {
+      toast.error(`Error while deleting the record: ${error.message}`);
+    },
   });
 
   useEffect(() => {
-
-    console.log("useEffect globalFilter: ", globalFilter);
+    // console.log("useEffect accountNameFilter: ", accountNameFilter);
     refetch();
     console.log("data inside useEffect: ", fetchedData);
-  }, [pageIndex, pageSize, sortBy, globalFilter, refetch]);
+  }, [pageIndex, pageSize, sortBy, globalFilter, refetch, currencyFilter, accountNameFilter]);
 
   const handleSortChange = (columnId) => {
     let newSortBy;
@@ -56,13 +98,24 @@ const FinancialsTable = () => {
     } else {
       // Sort by a new column, default to ascending
       newSortBy = { id: columnId, desc: false };
-    } setSortBy(newSortBy);
+    }
+    setSortBy(newSortBy);
     setPageIndex(0); // Reset to the first page when sorting changes
   };
 
   const handlePageSizeChange = (newPageSize) => {
-    console.log("handlePagesizeChange newPageSize: ", newPageSize);
+    // console.log("handlePagesizeChange newPageSize: ", newPageSize);
     setPageSize(newPageSize);
+    setPageIndex(0); // Reset to the first page when page size changes
+  };
+
+  const handleCurrencyChange = (newCurrency) => {
+    setCurrencyFilter(newCurrency);
+    setPageIndex(0); // Reset to the first page when page size changes
+  };
+
+  const handleAccountNameChange = (newAccountName) => {
+    setAccountNameFilter(newAccountName);
     setPageIndex(0); // Reset to the first page when page size changes
   };
 
@@ -75,23 +128,46 @@ const FinancialsTable = () => {
   };
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 ">
       <div className="flex flex-col sm:flex-row justify-between gap-2">
         <GlobalSearch
           className="sm:w-64"
           globalFilter={globalFilter}
           setGlobalFilter={handleGlobalFilterChange}
         />
-        <PageSizeMenu
-          className="sm:w-32"
-          pageSize={pageSize}
-          handlePageSizeChange={handlePageSizeChange}
-          options={[
-            { id: 10, caption: "10 rows" },
-            { id: 20, caption: "20 rows" },
-            { id: 50, caption: "50 rows" },
-          ]}
-        />
+        <div className='flex gap-4'>
+
+          <AccountNameFilter
+            className="sm:w-64"
+            accountNameFilter={accountNameFilter}
+            handleAccountNameChange={handleAccountNameChange}
+            options={[
+              { id: "", caption: "All Accounts" }, // Add the "All" option
+              { id: "Personal Loan Account", caption: "Personal Loan Account" },
+              { id: "Savings Account", caption: "Savings Account" },
+              { id: "Credit Card Account", caption: "Credit Card Account" },
+              { id: "Investment Account", caption: "Investment Account" },
+              { id: "Checking Account", caption: "Checking Account" },
+              { id: "Auto Loan Account", caption: "Auto Loan Account" },
+              { id: "Home Loan Account", caption: "Home Loan Account" },
+              { id: "Money Market Account", caption: "Money Market Account" },
+            ]}
+          />
+
+          <CurrencyFilter
+            className="sm:w-48"
+            currencyFilter={currencyFilter}
+            handleCurrencyChange={handleCurrencyChange}
+            options={[
+              { id: "", caption: "All Currency" }, // Add the "All" option
+              { id: "Euro", caption: "Euro" },
+              { id: "Indian Rupee", caption: "Indian Rupee" },
+              { id: "Yen", caption: "Yen" },
+              { id: "US Dollar", caption: "US Dollar" },
+            ]}
+          />
+        </div>
+
       </div>
       {isLoading ? (
         <div>Loading...</div>
@@ -105,7 +181,24 @@ const FinancialsTable = () => {
             sortBy={sortBy}
             onSortChange={handleSortChange}
           />
-          <div className="flex justify-center">
+
+          <Modal isOpen={isModalOpen} onClose={closeModal}>
+            {modalType === 'add' && <AddFinancial onSave={handleSave} onCancel={closeModal} />}
+            {modalType === 'edit' && selectedRow && <EditFinancial data={selectedRow} onSave={handleSave} onCancel={closeModal} />}
+            {modalType === 'view' && selectedRow && <ViewFinancial data={selectedRow} onClose={closeModal} />}
+          </Modal>
+
+          <div className="flex justify-between">
+            <PageSizeMenu
+              className="sm:w-32 mr-2   "
+              pageSize={pageSize}
+              handlePageSizeChange={handlePageSizeChange}
+              options={[
+                { id: 10, caption: "10 rows" },
+                { id: 20, caption: "20 rows" },
+                { id: 50, caption: "50 rows" },
+              ]}
+            />
             <PaginationNav
               gotoPage={gotoPage}
               canPreviousPage={pageIndex > 0}
@@ -122,9 +215,12 @@ const FinancialsTable = () => {
 
 export const Financials = () => {
   return (
-    <div className="grid max-w-screen-xl justify-center items-center  overflow-auto my-4 py-4 sm:py-0">
+    <div className=" max-w-screen-xl justify-center items-center  overflow-visible  my-4 py-4 sm:py-0">
       <FinancialsTable />
     </div>
   );
 };
+
+
+
 

@@ -15,7 +15,7 @@ CsvDataValidation.FinancialDetailSchema = joi_1.default.object({
     sex: joi_1.default.string().valid("male", "female").required(),
     city: joi_1.default.string().required(),
     accountNumber: joi_1.default.string().length(8).required(),
-    accountName: joi_1.default.string().required(),
+    accountName: joi_1.default.string().required(), // valid....
     amount: joi_1.default.string().required(),
-    currencyName: joi_1.default.string().required(),
+    currencyName: joi_1.default.string().required(), // valid....
 });

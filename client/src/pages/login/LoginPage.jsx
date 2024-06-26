@@ -4,15 +4,11 @@ import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 import { useContext } from "react";
 
-import { MainLayout } from "../../layouts/MainLayout";
 import { login } from "../../services/user";
 import { Mycontext } from "../../store/CreateContext";
 import { setToken } from "../../utils/helpers/auth";
 
-// eslint-disable-next-line react/prop-types
 export function LoginPage() {
-  //if (already logged) in redirect to home page
-  //....
   const navigate = useNavigate();
   const { setUserName, setUserEmail, setUserId } = useContext(Mycontext);
 
@@ -23,12 +19,12 @@ export function LoginPage() {
     onSuccess: (data) => {
       console.log(data);
 
-      sessionStorage.setItem("JWT", data.token);
-
+      localStorage.setItem("userName", data.name);
+      localStorage.setItem("userEmail", data.email);
+      localStorage.setItem("userId", data.id);
       setUserName(data.name);
       setUserEmail(data.email);
       setUserId(data.id);
-      // setIsAuth(true);
       setToken(data.token);
 
       navigate("/table");

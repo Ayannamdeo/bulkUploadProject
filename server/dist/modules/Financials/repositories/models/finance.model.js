@@ -19,5 +19,19 @@ const financeSchema = new mongoose_1.default.Schema({
         required: true,
     },
 }, { timestamps: true });
+financeSchema.index({
+    name: "text",
+    amount: "text",
+    city: "text",
+}, {
+    weights: {
+        name: 5,
+        city: 3,
+        amount: 3,
+    },
+});
+financeSchema.index({ createdAt: -1 });
+financeSchema.index({ currencyName: 1 });
+financeSchema.index({ accountName: 1 });
 const FINANCIAL_MODEL = mongoose_1.default.model("financial", financeSchema);
 exports.FINANCIAL_MODEL = FINANCIAL_MODEL;

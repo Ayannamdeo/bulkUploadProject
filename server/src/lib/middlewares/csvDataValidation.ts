@@ -9,9 +9,9 @@ class CsvDataValidation extends BaseValidation {
     sex: Joi.string().valid("male", "female").required(),
     city: Joi.string().required(),
     accountNumber: Joi.string().length(8).required(),
-    accountName: Joi.string().required(),
+    accountName: Joi.string().required(), // valid....
     amount: Joi.string().required(),
-    currencyName: Joi.string().required(),
+    currencyName: Joi.string().required(), // valid....
   });
 }
 

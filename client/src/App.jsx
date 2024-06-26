@@ -1,9 +1,8 @@
 import { Route, Routes } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-
-import { HomePage, RegisterPage, LoginPage, Financials, UploadFile } from "./pages/";
+import { HomePage, RegisterPage, LoginPage, Financials, UploadFile, FileReport, ErrorReport } from "./pages/";
 import { MainLayout } from "./layouts/MainLayout";
 
 import { Mycontext } from "./store/CreateContext";
@@ -13,7 +12,15 @@ function App() {
   const [userName, setUserName] = useState("");
   const [userEmail, setUserEmail] = useState("");
   const [userId, setUserId] = useState("");
-  // const [isAuth, setIsAuth] = useState(false);
+
+  useEffect(() => {
+    const storedUserName = localStorage.getItem("userName");
+    const storedUserEmail = localStorage.getItem("userEmail");
+    const storedUserId = localStorage.getItem("userId");
+    setUserName(storedUserName);
+    setUserEmail(storedUserEmail);
+    setUserId(storedUserId);
+  }, []);
 
   return (
     <>
@@ -25,6 +32,8 @@ function App() {
             <Route element={<Privateroutes />}>
               <Route path="/table" element={<Financials />} />
               <Route path="/uploadfile" element={<UploadFile />} />
+              <Route path="/filereport" element={<FileReport />} />
+              <Route path="/errorreport/:logId" element={<ErrorReport />} />
             </Route>
           </Route>
 

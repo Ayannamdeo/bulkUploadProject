@@ -21,6 +21,12 @@ class Financials_Router_Class {
     }
     setupRoutes() {
         this.router.get("/", this.financialControllers.getAllData);
+        this.router.get("/search", this.financialControllers.searchData);
+        this.router.post("/", this.financialControllers.createData);
+        this.router.patch("/:id", this.financialControllers.updateData);
+        this.router.delete("/:id", this.financialControllers.deleteData);
+        this.router.get("/filereport", this.financialControllers.getAllBulkUploadReportData);
+        this.router.get("/errorreport", this.financialControllers.getAllErrorReportData);
         this.router.post("/upload", multerHelpers_1.upload.single("csvfile"), this.financialControllers.uploadFile);
     }
 }

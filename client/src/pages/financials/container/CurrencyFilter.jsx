@@ -2,11 +2,11 @@ import { useMemo, Fragment } from "react";
 import { FaChevronDown, FaCheck } from "react-icons/fa";
 import { Listbox, Transition } from "@headlessui/react";
 
-export function PageSizeMenu({ pageSize, handlePageSizeChange, options, className = "", disabled }) {
-  const selectedOption = useMemo(() => options.find((o) => o.id === pageSize), [options, pageSize]);
+export function CurrencyFilter({ currencyFilter, handleCurrencyChange, options, className = "", disabled }) {
+  const selectedOption = useMemo(() => options.find((o) => o.id === currencyFilter), [options, currencyFilter]);
 
   return (
-    <Listbox value={pageSize} onChange={handlePageSizeChange} disabled={disabled}>
+    <Listbox value={currencyFilter} onChange={handleCurrencyChange} disabled={disabled}>
       <div className={`relative w-full ${className}`}>
         <Listbox.Button
           className={`relative w-full rounded-xl py-3 pl-3 pr-10 text-base text-gray-700 text-left shadow-[0_4px_10px_rgba(0,0,0,0.03)] focus:outline-none

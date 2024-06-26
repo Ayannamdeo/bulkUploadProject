@@ -20,6 +20,25 @@ const financeSchema: mongoose.Schema<IFinance> = new mongoose.Schema<IFinance>(
   { timestamps: true },
 );
 
+financeSchema.index(
+  {
+    name: "text",
+    amount: "text",
+    city: "text",
+  },
+  {
+    weights: {
+      name: 5,
+      city: 3,
+      amount: 3,
+    },
+  },
+);
+
+financeSchema.index({ createdAt: -1 });
+financeSchema.index({ currencyName: 1 });
+financeSchema.index({ accountName: 1 });
+
 const FINANCIAL_MODEL: mongoose.Model<IFinance> = mongoose.model<IFinance>(
   "financial",
   financeSchema,

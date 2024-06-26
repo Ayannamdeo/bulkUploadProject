@@ -11,6 +11,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.FinancialControllers = void 0;
 const logger_1 = require("../../lib/helpers/logger");
+const formatFileSize_1 = require("../../lib/helpers/formatFileSize");
 const Services_1 = require("./Services");
 class FinancialControllers {
     constructor() {
@@ -36,19 +37,112 @@ class FinancialControllers {
                 res.status(500).json({ message: error.message });
             }
         });
+        this.getAllBulkUploadReportData = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { page = 1, size = 10, sortBy = "createdAt", sortDirection = "desc", } = req.query;
+            try {
+                const { data, documentCount } = yield this.financialServices.getAllBulkUploadReport(Number(page), Number(size), sortBy, sortDirection);
+                if (!data) {
+                    logger_1.logger.warn("No BulkUploadReport data found");
+                    res.status(404).json({ message: "No BulkUploadReport data found" });
+                    return;
+                }
+                const totalPages = Math.ceil(documentCount / Number(size));
+                res.status(200).json({
+                    fileReport: data,
+                    totalPages: totalPages,
+                });
+            }
+            catch (error) {
+                logger_1.logger.error("Error while getting all BulkUploadReport data", error);
+                res.status(500).json({ message: error.message });
+            }
+        });
+        this.getAllErrorReportData = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            const { page = 1, size = 10, logId } = req.query;
+            console.log("inside getAllErrorReportData logId", logId);
+            try {
+                const { data, documentCount } = yield this.financialServices.getAllErrorReport(Number(page), Number(size), logId);
+                if (!data) {
+                    logger_1.logger.warn("No ErrorReport data found");
+                    res.status(404).json({ message: "No ErrorReport data found" });
+                    return;
+                }
+                const totalPages = Math.ceil(documentCount / Number(size));
+                res.status(200).json({ errorReport: data, totalPages: totalPages });
+            }
+            catch (error) {
+                logger_1.logger.error("Error while getting all ErrorReport data", error);
+                res.status(500).json({ message: error.message });
+            }
+        });
+        this.searchData = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            console.log("inside search dAta");
+            try {
+                const { searchResults, totalDocuments } = yield this.financialServices.searchFinancials(req.query);
+                const totalPages = Math.ceil(totalDocuments / Number(req.query.size));
+                // res.status(200).send("CHECKPOINT");
+                res.status(200).json({
+                    financials: searchResults,
+                    totalPages: totalPages,
+                });
+            }
+            catch (error) {
+                logger_1.logger.error("Error while getting all financial data", error);
+                res.status(500).json({ message: error.message });
+            }
+        });
+        this.createData = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("req.body inside createData: ", req.body);
+                const createdData = yield this.financialServices.CreateFinancials(req.body);
+                res.status(200).json(createdData);
+            }
+            catch (err) {
+                logger_1.logger.error("error in createData Api", err);
+                res.status(500).json({ message: err.message });
+            }
+        });
+        this.updateData = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("req.body inside createData: ", req.body);
+                console.log(" req.params inside createData: ", req.params);
+                const updatedData = yield this.financialServices.UpdateFinancials(req.params.id, req.body);
+                res.status(200).json(updatedData);
+            }
+            catch (err) {
+                logger_1.logger.error("error in updateData Api", err);
+                res.status(500).json({ message: err.message });
+            }
+        });
+        this.deleteData = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            console.log("id in params: ", req.params.id);
+            try {
+                const deletedContent = yield this.financialServices.deleteFinancials(req.params.id);
+                res.status(200).json(deletedContent);
+            }
+            catch (err) {
+                logger_1.logger.error("error in deleteData Api", err);
+                res.status(500).json({ message: err.message });
+            }
+        });
         this.uploadFile = (req, res) => __awaiter(this, void 0, void 0, function* () {
-            var _a, _b;
+            var _a, _b, _c;
             try {
                 const fileName = (_a = req.file) === null || _a === void 0 ? void 0 : _a.originalname;
                 const filePath = (_b = req.file) === null || _b === void 0 ? void 0 : _b.path;
+                const fileSize = (_c = req.file) === null || _c === void 0 ? void 0 : _c.size;
+                const formattedFileSize = (0, formatFileSize_1.formatFileSize)(fileSize);
+                const userName = req.body.userName;
+                console.log("filesize", formattedFileSize);
+                console.log("userName", userName);
+                console.log("req.body", req.body);
                 if (!filePath) {
                     res.status(400).json({ message: "no file uploaded" });
                     return;
                 }
-                yield this.financialServices.uploadCsvFile(fileName, filePath);
-                res.status(201).json({
-                    message: "CSV data uploaded and saved to MongoDB successfully",
-                });
+                const response = yield this.financialServices.uploadCsvFile(fileName, filePath, formattedFileSize, userName);
+                console.log("response in controller", response);
+                res.status(201).json({ message: response });
                 return;
             }
             catch (error) {

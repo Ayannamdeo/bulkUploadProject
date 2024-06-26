@@ -23,11 +23,24 @@ export function PaginationNav({
     }
   };
   const renderPageLinks = useCallback(() => {
-    if (pageCount === 0) return null;
     const visiblePageButtonCount = 3; // Number of visible pages at the start and end
     const firstellipsis = <li key="ellipsis">...</li>;
     const lastellipsis = <li key="last-ellipsis">...</li>;
     const pages = [];
+
+    if (pageCount === 0) return null;
+    if (pageCount === 1) {
+      pages.push(
+        <li key={0}>
+          <Button2
+            content={1}
+            onClick={() => gotoPage(0)}
+            active={pageIndex === 0}
+          />
+        </li>
+      );
+      return pages;
+    }
 
     // Show the first page
     pages.push(
@@ -83,7 +96,7 @@ export function PaginationNav({
 
   return (
     <div className="flex items-center gap-2">
-      <ul className="flex gap-2">
+      <ul className="flex gap-2  mr-64">
         <li>
           <Button2
             content={
