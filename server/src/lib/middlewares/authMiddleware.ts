@@ -1,15 +1,17 @@
 import { NextFunction, Request, Response } from "express";
-import JWT from "jsonwebtoken";
+import JWT, { JwtPayload } from "jsonwebtoken";
 import { serverConfig } from "../../config";
 import { logger } from "../helpers/logger";
 
 class AuthMiddleware {
-  static authenticate = ( req: Request, res: Response, next: NextFunction): void => {
-    logger.debug("Request cookies", { cookies: req.cookies });
-
+  static authenticate = (
+    req: Request,
+    res: Response,
+    next: NextFunction,
+  ): void => {
+    // logger.info("Request cookies", { cookies: req.cookies });
     // const cookietoken = req.cookies?.JWT_Token;
     const authHeader = req.headers.authorization;
-    console.log("authHeader", authHeader);
 
     if (!authHeader) {
       logger.warn("Authorization header  is missing");
@@ -18,15 +20,16 @@ class AuthMiddleware {
     }
 
     const token = authHeader.split(" ")[1];
-    if(!token){
+    if (!token) {
       logger.warn("Authorization token is missing");
-      res.status(401).json({message: "Authorization token is missing"});
+      res.status(401).json({ message: "Authorization token is missing" });
       return;
     }
 
     try {
-      const decoded = JWT.verify(token, serverConfig.jwtSecret);
-      logger.debug("jwt.verify return value = ", { decoded });
+      const decoded = JWT.verify(token, serverConfig.jwtSecret) as JwtPayload;
+      logger.info("jwt.verify return value = ", { decoded });
+      req.headers["user-agent"] = decoded.userId;
       next();
     } catch (error) {
       logger.error("Invalid Token or Session expired", { error });
@@ -34,25 +37,25 @@ class AuthMiddleware {
     }
   };
 
-  static restrictTo = (roles: string[] = []) => {
-    return (req: Request, res: Response, next: NextFunction): void => {
-      const token = req.cookies?.JWT_Token;
-      const decoded = JWT.decode(token);
-      logger.debug("Decoded token in restrictTo", { decoded });
-
-      const decodedPayload = decoded as any;
-      const existingUserRole = decodedPayload.role;
-
-      if (!roles.includes(existingUserRole)) {
-        logger.warn("Unauthorized access attempt", { existingUserRole, roles, });
-        res.status(401).json({ message: "UNAUTHORIZED" });
-        return;
-      }
-
-      next();
-      // res.send("CHECKPOINT");
-    };
-  };
+  // static restrictTo = (roles: string[] = []) => {
+  //   return (req: Request, res: Response, next: NextFunction): void => {
+  //     const token = req.cookies?.JWT_Token;
+  //     const decoded = JWT.decode(token);
+  //     logger.debug("Decoded token in restrictTo", { decoded });
+  //
+  //     const decodedPayload = decoded as any;
+  //     const existingUserRole = decodedPayload.role;
+  //
+  //     if (!roles.includes(existingUserRole)) {
+  //       logger.warn("Unauthorized access attempt", { existingUserRole, roles, });
+  //       res.status(401).json({ message: "UNAUTHORIZED" });
+  //       return;
+  //     }
+  //
+  //     next();
+  //     // res.send("CHECKPOINT");
+  //   };
+  // };
 }
 
 export { AuthMiddleware };

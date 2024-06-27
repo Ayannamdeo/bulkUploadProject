@@ -6,11 +6,13 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.FINANCIAL_MODEL = void 0;
 const mongoose_1 = __importDefault(require("mongoose"));
 const financeSchema = new mongoose_1.default.Schema({
+    uploadId: { type: String, required: true },
     name: { type: String, required: true },
     age: { type: Number, min: 18, max: 75, required: true },
     sex: { type: String, enum: ["male", "female"], required: true },
+    country: { type: String, required: true },
     city: { type: String, required: true },
-    accountNumber: { type: String, required: true },
+    accountNumber: { type: String, length: 8, required: true },
     accountName: { type: String, required: true },
     amount: { type: String, required: true },
     currencyName: {
@@ -18,6 +20,10 @@ const financeSchema = new mongoose_1.default.Schema({
         enum: ["US Dollar", "Indian Rupee", "Yen", "Euro"],
         required: true,
     },
+    jobTitle: { type: String, required: true },
+    phoneNumber: { type: String, required: true },
+    companyName: { type: String, required: true },
+    transactionDescription: { type: String, required: true },
 }, { timestamps: true });
 financeSchema.index({
     name: "text",

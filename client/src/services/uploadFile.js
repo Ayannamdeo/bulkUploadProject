@@ -1,10 +1,10 @@
 import axios from "axios";
 import { getToken } from "../utils/helpers/auth";
 
-export const uploadFile = async (formData, userName) => {
+export const uploadFile = async (formData, userEmail) => {
   try {
     const token = getToken();
-    formData.append("userName", userName);
+    formData.append("userEmail", userEmail);
     const config = {
       headers: {
         "Content-Type": "multipart/form-data",

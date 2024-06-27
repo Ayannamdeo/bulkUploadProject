@@ -41,19 +41,63 @@ class FinancialServices {
     );
   };
 
-  CreateFinancials = async (data: IFinance): Promise<IFinance> => {
-    return await this.financialRepository.create(data);
+  findBulkUploadReportByUploadId = async (
+    id: string,
+  ): Promise<IBulkUpload | null> => {
+    return await this.bulkUploadReportRepository.getBulkUploadReportByUploadId(
+      id,
+    );
+  };
+
+  CreateFinancials = async (data: any): Promise<IFinance | string[]> => {
+    const newUploadId = new Date().getTime().toString();
+    const dataWithUploadId = { uploadId: newUploadId, ...data };
+    const { error } = CsvDataValidation.FinancialDetailSchema.validate(
+      dataWithUploadId,
+      { abortEarly: false },
+    );
+    if (error) {
+      const errorDetails = error?.details.map((err) => `${err.message}\n`);
+      return errorDetails;
+    } else {
+      return await this.financialRepository.create(dataWithUploadId);
+    }
   };
 
   UpdateFinancials = async (
     id: string,
-    data: IFinance,
-  ): Promise<IFinance | null> => {
-    return await this.financialRepository.update(id, data);
+    data: any,
+  ): Promise<IFinance | string[] | null> => {
+    const keysToFilter = ["_id", "__v", "createdAt", "updatedAt"];
+    const filteredData = Object.keys(data).reduce((acc: any, key) => {
+      if (!keysToFilter.includes(key)) {
+        acc[key] = data[key];
+      }
+      return acc;
+    }, {});
+
+    const { error } = CsvDataValidation.FinancialDetailSchema.validate(
+      filteredData,
+      {
+        abortEarly: false,
+      },
+    );
+    if (error) {
+      const errorDetails = error?.details.map((err) => `${err.message}\n`);
+      return errorDetails;
+    } else {
+      return await this.financialRepository.update(id, filteredData);
+    }
   };
 
   deleteFinancials = async (id: string): Promise<any> => {
     return await this.financialRepository.delete(id);
+  };
+
+  deleteBulk = async (id: string): Promise<any> => {
+    const r1 = await this.bulkErrorRepository.deleteAllErrorReports(id);
+    const r2 = await this.financialRepository.deleteManyRecords(id);
+    return { r1, r2 };
   };
 
   countAllFinancials = async (): Promise<number> => {
@@ -99,16 +143,25 @@ class FinancialServices {
     return await this.bulkErrorRepository.getAllErrorReport(page, limit, logId);
   };
 
-  private static transformEntry = (csvRowData: any): IFinance => {
+  private static transformEntry = (
+    csvRowData: any,
+    uploadId: string,
+  ): IFinance => {
     const transformedRow = {
+      uploadId: uploadId,
       name: csvRowData.name,
       age: parseInt(csvRowData.age, 10), // Convert age to a number
       sex: csvRowData.sex,
+      country: csvRowData.country,
       city: csvRowData.city,
-      accountNumber: csvRowData.accountNumber, // Keep accountNumber as a string it's an identifier
+      accountNumber: csvRowData.accountNumber,
       accountName: csvRowData.accountName,
       amount: csvRowData.amount,
       currencyName: csvRowData.currencyName,
+      jobTitle: csvRowData.jobTitle,
+      phoneNumber: csvRowData.phoneNumber,
+      companyName: csvRowData.companyName,
+      transactionDescription: csvRowData.transactionDescription,
     };
     return transformedRow;
   };
@@ -119,7 +172,6 @@ class FinancialServices {
   ): Promise<{ passed: IFinance[]; failed: IBulkError[] }> => {
     const passed: IFinance[] = [];
     const failed: IBulkError[] = [];
-    // const uploadId = new Date().getTime().toString();
 
     entries.forEach((entry: any, index: number) => {
       const { error } = CsvDataValidation.FinancialDetailSchema.validate(
@@ -165,7 +217,7 @@ class FinancialServices {
     fileName: string,
     filePath: string,
     fileSize: string,
-    userName: string,
+    userEmail: string,
   ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const batchSize = 10000;
@@ -188,10 +240,13 @@ class FinancialServices {
         .pipe(parse({ headers: true }))
         .on("error", (error) => {
           logger.error(".on(error): ", error);
-          reject(error); // Reject the Promise on error
+          reject(error);
         })
         .on("data", async (row) => {
-          const transformedData = FinancialServices.transformEntry(row);
+          const transformedData = FinancialServices.transformEntry(
+            row,
+            uploadId,
+          );
           currentBatch.push(transformedData);
 
           if (currentBatch.length >= batchSize) {
@@ -230,7 +285,7 @@ class FinancialServices {
 
           await this.bulkUploadReportRepository.uploadBulkUploadReport({
             uploadId: uploadId,
-            userName: userName,
+            userEmail: userEmail,
             fileSize: fileSize,
             startTime: startTime,
             endTime: endTime,
@@ -241,7 +296,7 @@ class FinancialServices {
           });
 
           logger.info(`Parsed ${rowCount} rows`);
-          resolve("CSV data uploaded and saved to MongoDB successfully"); // Resolve the Promise with success message
+          resolve("CSV data uploaded and saved to MongoDB successfully");
         });
     });
   };

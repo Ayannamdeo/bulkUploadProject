@@ -17,7 +17,7 @@ const Modal = ({ isOpen, onClose, children }) => {
   return (
     <ReactPortal>
       <div className="border border-red-400 fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={onClose}>
-        <div className="bg-white p-8 rounded-lg shadow-lg" onClick={e => e.stopPropagation()}>
+        <div className="" onClick={e => e.stopPropagation()}>
           {children}
         </div>
       </div>

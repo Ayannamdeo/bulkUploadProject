@@ -38,3 +38,30 @@ export const getFileReportData = async ({
     throw new Error(error.message);
   }
 };
+
+export const deleteAllFileData = async (uploadId) => {
+  try {
+    const token = getToken();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      data: { uploadId },
+    };
+
+    const { data } = await axios.delete(
+      `http://localhost:3000/api/financials/filereport`,
+      config,
+    );
+
+    console.log("data from deleteAllFileData", data);
+    return data;
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      console.error(error.response.data.message);
+      throw new Error(error.response.data.message);
+    }
+    console.error(error.message);
+    throw new Error(error.message);
+  }
+};

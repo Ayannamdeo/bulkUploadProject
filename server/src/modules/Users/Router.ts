@@ -34,28 +34,28 @@ class User_Router_Class {
       this.userControllers.login,
     );
 
-    this.router.get(
-      "/",
-      AuthMiddleware.restrictTo(["NORMAL", "ADMIN"]),
-      (req: Request, res: Response) => {
-        return res
-          .status(200)
-          .json({ message: "Accessible by admins and normal users alike" });
-      },
-    );
-
-    this.router.get(
-      "/admin",
-      AuthMiddleware.authenticate,
-      AuthMiddleware.restrictTo(["ADMIN"]),
-      this.userControllers.getAllUsers,
-    );
-    this.router.delete(
-      "/admin/:id",
-      AuthMiddleware.authenticate,
-      AuthMiddleware.restrictTo(["ADMIN"]),
-      this.userControllers.deleteUser,
-    );
+    // this.router.get(
+    //   "/",
+    //   AuthMiddleware.restrictTo(["NORMAL", "ADMIN"]),
+    //   (req: Request, res: Response) => {
+    //     return res
+    //       .status(200)
+    //       .json({ message: "Accessible by admins and normal users alike" });
+    //   },
+    // );
+    //
+    // this.router.get(
+    //   "/admin",
+    //   AuthMiddleware.authenticate,
+    //   AuthMiddleware.restrictTo(["ADMIN"]),
+    //   this.userControllers.getAllUsers,
+    // );
+    // this.router.delete(
+    //   "/admin/:id",
+    //   AuthMiddleware.authenticate,
+    //   AuthMiddleware.restrictTo(["ADMIN"]),
+    //   this.userControllers.deleteUser,
+    // );
   }
 }
 

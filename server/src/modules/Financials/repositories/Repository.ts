@@ -25,6 +25,7 @@ class FinancialRepository {
   ): Promise<IFinance[] | null> => {
     const offset = (page - 1) * limit;
     return await FINANCIAL_MODEL.find()
+      .allowDiskUse(true)
       .skip(offset)
       .limit(limit)
       .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 });
@@ -39,6 +40,10 @@ class FinancialRepository {
 
   public delete = async (id: string): Promise<any> => {
     return await FINANCIAL_MODEL.findByIdAndDelete(id);
+  };
+
+  public deleteManyRecords = async (id: string): Promise<any> => {
+    return await FINANCIAL_MODEL.deleteMany({ uploadId: id });
   };
 
   public countAll = async (): Promise<number> => {
@@ -61,6 +66,16 @@ class BulkUploadReportRepository {
     return await BULK_UPLOAD_REPORT.create(data);
   };
 
+  public getBulkUploadReportByUploadId = async (
+    id: string,
+  ): Promise<IBulkUpload | null> => {
+    return await BULK_UPLOAD_REPORT.findOne({ uploadId: id });
+  };
+
+  // public deleteBulkUploadReport = async (id: string):Promise<any> => {
+  //   return await BULK_UPLOAD_REPORT.findByIdAndDelete(id);
+  // }
+
   public getAllUploadReport = async (
     page: number = 1,
     limit: number = 10,
@@ -80,6 +95,10 @@ class BulkUploadReportRepository {
 class BulkErrorRepository {
   public uploadErrors = async (data: IBulkError[]): Promise<any> => {
     return await BULK_ERROR_REPORT.insertMany(data, { ordered: false });
+  };
+
+  public deleteAllErrorReports = async (id: string): Promise<any> => {
+    return await BULK_ERROR_REPORT.deleteMany({ uploadId: id });
   };
 
   public getAllErrorReport = async (

@@ -8,8 +8,8 @@ import { Mycontext } from "../../store/CreateContext";
 export const UploadFile = () => {
 	const [file, setFile] = useState(null);
 	const [isUploading, setIsUploading] = useState(false);
-	const { userName } = useContext(Mycontext)
-	console.log("userName in uploadFile", userName);
+	const { userEmail } = useContext(Mycontext)
+	console.log("userName in uploadFile", userEmail);
 
 	const handleFileChange = (e) => {
 		setFile(e.target.files[0]);
@@ -27,7 +27,7 @@ export const UploadFile = () => {
 		formData.append("csvfile", file);
 
 		try {
-			const response = await uploadFile(formData, userName);
+			const response = await uploadFile(formData, userEmail);
 			if (response.message === "CSV data uploaded and saved to MongoDB successfully") {
 				toast.success("File uploaded successfully!");
 			}

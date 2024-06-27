@@ -8,8 +8,8 @@ export const getColumns = (handleView, handleDelete) => [
     disableSortBy: true,
   },
   {
-    Header: 'User Name',
-    accessor: 'userName',
+    Header: 'User Email',
+    accessor: 'userEmail',
     width: '125px',
     disableSortBy: true,
   },

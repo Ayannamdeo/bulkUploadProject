@@ -14,6 +14,7 @@ const logger_1 = require("../../lib/helpers/logger");
 const formatFileSize_1 = require("../../lib/helpers/formatFileSize");
 const Services_1 = require("./Services");
 class FinancialControllers {
+    // private readonly
     constructor() {
         this.getAllData = (req, res) => __awaiter(this, void 0, void 0, function* () {
             const { page = 1, size = 10, sortBy = "createdAt", sortDirection = "desc", } = req.query;
@@ -95,6 +96,10 @@ class FinancialControllers {
             try {
                 console.log("req.body inside createData: ", req.body);
                 const createdData = yield this.financialServices.CreateFinancials(req.body);
+                if (Array.isArray(createdData)) {
+                    res.status(400).json({ message: createdData });
+                    return;
+                }
                 res.status(200).json(createdData);
             }
             catch (err) {
@@ -104,9 +109,14 @@ class FinancialControllers {
         });
         this.updateData = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
-                console.log("req.body inside createData: ", req.body);
-                console.log(" req.params inside createData: ", req.params);
+                // console.log("req.body inside createData: ", req.body);
+                // console.log(" req.params inside createData: ", req.params);
                 const updatedData = yield this.financialServices.UpdateFinancials(req.params.id, req.body);
+                if (Array.isArray(updatedData)) {
+                    res.status(400).json({ message: updatedData });
+                    return;
+                }
+                // console.log("updatedData", updatedData);
                 res.status(200).json(updatedData);
             }
             catch (err) {
@@ -125,6 +135,34 @@ class FinancialControllers {
                 res.status(500).json({ message: err.message });
             }
         });
+        this.deleteAllRecords = (req, res) => __awaiter(this, void 0, void 0, function* () {
+            try {
+                console.log("req.body inside deleAllRecordes", req.body);
+                console.log("req.headers inside deleAllRecordes", req.headers);
+                const report = yield this.financialServices.findBulkUploadReportByUploadId(req.body.uploadId);
+                if (report) {
+                    if (report.userEmail === req.headers["user-agent"]) {
+                        const response = yield this.financialServices.deleteBulk(req.body.uploadId);
+                        res.status(200).json(response);
+                        return;
+                    }
+                    else {
+                        res.status(400).json({
+                            message: "user not Authorized to delete this file Report Data",
+                        });
+                        return;
+                    }
+                }
+                res
+                    .status(404)
+                    .json({ message: "No report by the request UploadId data found" });
+                return;
+            }
+            catch (err) {
+                logger_1.logger.error("error in deleteAllRecords Api", err);
+                res.status(500).json({ message: err.message });
+            }
+        });
         this.uploadFile = (req, res) => __awaiter(this, void 0, void 0, function* () {
             var _a, _b, _c;
             try {
@@ -132,15 +170,15 @@ class FinancialControllers {
                 const filePath = (_b = req.file) === null || _b === void 0 ? void 0 : _b.path;
                 const fileSize = (_c = req.file) === null || _c === void 0 ? void 0 : _c.size;
                 const formattedFileSize = (0, formatFileSize_1.formatFileSize)(fileSize);
-                const userName = req.body.userName;
+                const userEmail = req.body.userEmail;
                 console.log("filesize", formattedFileSize);
-                console.log("userName", userName);
+                console.log("userEmail", userEmail);
                 console.log("req.body", req.body);
                 if (!filePath) {
                     res.status(400).json({ message: "no file uploaded" });
                     return;
                 }
-                const response = yield this.financialServices.uploadCsvFile(fileName, filePath, formattedFileSize, userName);
+                const response = yield this.financialServices.uploadCsvFile(fileName, filePath, formattedFileSize, userEmail);
                 console.log("response in controller", response);
                 res.status(201).json({ message: response });
                 return;

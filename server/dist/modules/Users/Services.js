@@ -42,7 +42,7 @@ UserServices.verifyPassword = (currentUser, existingUser) => __awaiter(void 0, v
     return yield bcrypt_1.default.compare(currentUser.password, existingUser.password);
 });
 UserServices.generateToken = (existingUser, jwtsecret) => {
-    return jsonwebtoken_1.default.sign({ userId: existingUser.name, role: existingUser.role }, jwtsecret, {
+    return jsonwebtoken_1.default.sign({ userId: existingUser.email, role: existingUser.role }, jwtsecret, {
         expiresIn: 60 * 15,
     });
 };

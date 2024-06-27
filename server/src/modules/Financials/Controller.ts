@@ -1,4 +1,4 @@
-import { Request, Response } from "express";
+import { Request, Response, response } from "express";
 
 import { logger } from "../../lib/helpers/logger";
 import { formatFileSize } from "../../lib/helpers/formatFileSize";
@@ -7,6 +7,7 @@ import { IFinance } from "./entities";
 
 class FinancialControllers {
   private readonly financialServices: FinancialServices;
+  // private readonly
 
   constructor() {
     this.financialServices = new FinancialServices();
@@ -131,6 +132,10 @@ class FinancialControllers {
       const createdData = await this.financialServices.CreateFinancials(
         req.body,
       );
+      if (Array.isArray(createdData)) {
+        res.status(400).json({ message: createdData });
+        return;
+      }
       res.status(200).json(createdData);
     } catch (err: any) {
       logger.error("error in createData Api", err);
@@ -140,12 +145,17 @@ class FinancialControllers {
 
   updateData = async (req: Request, res: Response): Promise<void> => {
     try {
-      console.log("req.body inside createData: ", req.body);
-      console.log(" req.params inside createData: ", req.params);
+      // console.log("req.body inside createData: ", req.body);
+      // console.log(" req.params inside createData: ", req.params);
       const updatedData = await this.financialServices.UpdateFinancials(
         req.params.id,
         req.body,
       );
+      if (Array.isArray(updatedData)) {
+        res.status(400).json({ message: updatedData });
+        return;
+      }
+      // console.log("updatedData", updatedData);
       res.status(200).json(updatedData);
     } catch (err: any) {
       logger.error("error in updateData Api", err);
@@ -166,15 +176,48 @@ class FinancialControllers {
     }
   };
 
+  deleteAllRecords = async (req: Request, res: Response): Promise<void> => {
+    try {
+      console.log("req.body inside deleAllRecordes", req.body);
+      console.log("req.headers inside deleAllRecordes", req.headers);
+
+      const report =
+        await this.financialServices.findBulkUploadReportByUploadId(
+          req.body.uploadId,
+        );
+      if (report) {
+        if (report.userEmail === req.headers["user-agent"]) {
+          const response = await this.financialServices.deleteBulk(
+            req.body.uploadId,
+          );
+          res.status(200).json(response);
+          return;
+        } else {
+          res.status(400).json({
+            message: "user not Authorized to delete this file Report Data",
+          });
+          return;
+        }
+      }
+      res
+        .status(404)
+        .json({ message: "No report by the request UploadId data found" });
+      return;
+    } catch (err: any) {
+      logger.error("error in deleteAllRecords Api", err);
+      res.status(500).json({ message: err.message });
+    }
+  };
+
   uploadFile = async (req: Request, res: Response): Promise<void> => {
     try {
       const fileName: string | undefined = req.file?.originalname;
       const filePath: string | undefined = req.file?.path;
       const fileSize: number | undefined = req.file?.size;
       const formattedFileSize = formatFileSize(fileSize as number);
-      const userName = req.body.userName;
+      const userEmail = req.body.userEmail;
       console.log("filesize", formattedFileSize);
-      console.log("userName", userName);
+      console.log("userEmail", userEmail);
       console.log("req.body", req.body);
       if (!filePath) {
         res.status(400).json({ message: "no file uploaded" });
@@ -184,7 +227,7 @@ class FinancialControllers {
         fileName as string,
         filePath,
         formattedFileSize,
-        userName,
+        userEmail,
       );
       console.log("response in controller", response);
       res.status(201).json({ message: response });

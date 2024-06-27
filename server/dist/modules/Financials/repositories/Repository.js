@@ -18,12 +18,16 @@ class FinancialRepository {
         this.getAll = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, sortBy = "createdAt", sortDirection = "desc") {
             const offset = (page - 1) * limit;
             return yield models_1.FINANCIAL_MODEL.find()
+                .allowDiskUse(true)
                 .skip(offset)
                 .limit(limit)
                 .sort({ [sortBy]: sortDirection === "asc" ? 1 : -1 });
         });
         this.delete = (id) => __awaiter(this, void 0, void 0, function* () {
             return yield models_1.FINANCIAL_MODEL.findByIdAndDelete(id);
+        });
+        this.deleteManyRecords = (id) => __awaiter(this, void 0, void 0, function* () {
+            return yield models_1.FINANCIAL_MODEL.deleteMany({ uploadId: id });
         });
         this.countAll = () => __awaiter(this, void 0, void 0, function* () {
             return yield models_1.FINANCIAL_MODEL.countDocuments();
@@ -52,6 +56,12 @@ class BulkUploadReportRepository {
         this.uploadBulkUploadReport = (data) => __awaiter(this, void 0, void 0, function* () {
             return yield models_2.BULK_UPLOAD_REPORT.create(data);
         });
+        this.getBulkUploadReportByUploadId = (id) => __awaiter(this, void 0, void 0, function* () {
+            return yield models_2.BULK_UPLOAD_REPORT.findOne({ uploadId: id });
+        });
+        // public deleteBulkUploadReport = async (id: string):Promise<any> => {
+        //   return await BULK_UPLOAD_REPORT.findByIdAndDelete(id);
+        // }
         this.getAllUploadReport = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, sortBy = "createdAt", sortDirection = "desc") {
             const offset = (page - 1) * limit;
             const documentCount = yield models_2.BULK_UPLOAD_REPORT.countDocuments();
@@ -68,6 +78,9 @@ class BulkErrorRepository {
     constructor() {
         this.uploadErrors = (data) => __awaiter(this, void 0, void 0, function* () {
             return yield models_3.BULK_ERROR_REPORT.insertMany(data, { ordered: false });
+        });
+        this.deleteAllErrorReports = (id) => __awaiter(this, void 0, void 0, function* () {
+            return yield models_3.BULK_ERROR_REPORT.deleteMany({ uploadId: id });
         });
         this.getAllErrorReport = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, logId) {
             const offset = (page - 1) * limit;

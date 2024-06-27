@@ -25,14 +25,47 @@ class FinancialServices {
         this.getAllFinancials = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, sortBy = "createdAt", sortDirection = "desc") {
             return yield this.financialRepository.getAll(page, limit, sortBy, sortDirection);
         });
+        this.findBulkUploadReportByUploadId = (id) => __awaiter(this, void 0, void 0, function* () {
+            return yield this.bulkUploadReportRepository.getBulkUploadReportByUploadId(id);
+        });
         this.CreateFinancials = (data) => __awaiter(this, void 0, void 0, function* () {
-            return yield this.financialRepository.create(data);
+            const newUploadId = new Date().getTime().toString();
+            const dataWithUploadId = Object.assign({ uploadId: newUploadId }, data);
+            const { error } = csvDataValidation_1.CsvDataValidation.FinancialDetailSchema.validate(dataWithUploadId, { abortEarly: false });
+            if (error) {
+                const errorDetails = error === null || error === void 0 ? void 0 : error.details.map((err) => `${err.message}\n`);
+                return errorDetails;
+            }
+            else {
+                return yield this.financialRepository.create(dataWithUploadId);
+            }
         });
         this.UpdateFinancials = (id, data) => __awaiter(this, void 0, void 0, function* () {
-            return yield this.financialRepository.update(id, data);
+            const keysToFilter = ["_id", "__v", "createdAt", "updatedAt"];
+            const filteredData = Object.keys(data).reduce((acc, key) => {
+                if (!keysToFilter.includes(key)) {
+                    acc[key] = data[key];
+                }
+                return acc;
+            }, {});
+            const { error } = csvDataValidation_1.CsvDataValidation.FinancialDetailSchema.validate(filteredData, {
+                abortEarly: false,
+            });
+            if (error) {
+                const errorDetails = error === null || error === void 0 ? void 0 : error.details.map((err) => `${err.message}\n`);
+                return errorDetails;
+            }
+            else {
+                return yield this.financialRepository.update(id, filteredData);
+            }
         });
         this.deleteFinancials = (id) => __awaiter(this, void 0, void 0, function* () {
             return yield this.financialRepository.delete(id);
+        });
+        this.deleteBulk = (id) => __awaiter(this, void 0, void 0, function* () {
+            const r1 = yield this.bulkErrorRepository.deleteAllErrorReports(id);
+            const r2 = yield this.financialRepository.deleteManyRecords(id);
+            return { r1, r2 };
         });
         this.countAllFinancials = () => __awaiter(this, void 0, void 0, function* () {
             return yield this.financialRepository.countAll();
@@ -70,7 +103,7 @@ class FinancialServices {
                 return { passedCount: 0, failedCount: 0 };
             }
         });
-        this.uploadCsvFile = (fileName, filePath, fileSize, userName) => __awaiter(this, void 0, void 0, function* () {
+        this.uploadCsvFile = (fileName, filePath, fileSize, userEmail) => __awaiter(this, void 0, void 0, function* () {
             return new Promise((resolve, reject) => {
                 const batchSize = 10000;
                 let currentBatch = [];
@@ -90,10 +123,10 @@ class FinancialServices {
                     .pipe((0, fast_csv_1.parse)({ headers: true }))
                     .on("error", (error) => {
                     logger_1.logger.error(".on(error): ", error);
-                    reject(error); // Reject the Promise on error
+                    reject(error);
                 })
                     .on("data", (row) => __awaiter(this, void 0, void 0, function* () {
-                    const transformedData = _a.transformEntry(row);
+                    const transformedData = _a.transformEntry(row, uploadId);
                     currentBatch.push(transformedData);
                     if (currentBatch.length >= batchSize) {
                         csvStream.pause();
@@ -122,7 +155,7 @@ class FinancialServices {
                     });
                     yield this.bulkUploadReportRepository.uploadBulkUploadReport({
                         uploadId: uploadId,
-                        userName: userName,
+                        userEmail: userEmail,
                         fileSize: fileSize,
                         startTime: startTime,
                         endTime: endTime,
@@ -132,7 +165,7 @@ class FinancialServices {
                         failedEntries: failedEntries,
                     });
                     logger_1.logger.info(`Parsed ${rowCount} rows`);
-                    resolve("CSV data uploaded and saved to MongoDB successfully"); // Resolve the Promise with success message
+                    resolve("CSV data uploaded and saved to MongoDB successfully");
                 }));
             });
         });
@@ -143,23 +176,28 @@ class FinancialServices {
 }
 exports.FinancialServices = FinancialServices;
 _a = FinancialServices;
-FinancialServices.transformEntry = (csvRowData) => {
+FinancialServices.transformEntry = (csvRowData, uploadId) => {
     const transformedRow = {
+        uploadId: uploadId,
         name: csvRowData.name,
         age: parseInt(csvRowData.age, 10), // Convert age to a number
         sex: csvRowData.sex,
+        country: csvRowData.country,
         city: csvRowData.city,
-        accountNumber: csvRowData.accountNumber, // Keep accountNumber as a string it's an identifier
+        accountNumber: csvRowData.accountNumber,
         accountName: csvRowData.accountName,
         amount: csvRowData.amount,
         currencyName: csvRowData.currencyName,
+        jobTitle: csvRowData.jobTitle,
+        phoneNumber: csvRowData.phoneNumber,
+        companyName: csvRowData.companyName,
+        transactionDescription: csvRowData.transactionDescription,
     };
     return transformedRow;
 };
 FinancialServices.validateEntries = (entries, uploadId) => __awaiter(void 0, void 0, void 0, function* () {
     const passed = [];
     const failed = [];
-    // const uploadId = new Date().getTime().toString();
     entries.forEach((entry, index) => {
         const { error } = csvDataValidation_1.CsvDataValidation.FinancialDetailSchema.validate(entry, { abortEarly: false });
         if (error) {

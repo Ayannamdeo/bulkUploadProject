@@ -5,19 +5,23 @@ import { useNavigate } from 'react-router-dom';
 
 import { getColumns } from './container/getColumns';
 import { TableComponent, PaginationNav, PageSizeMenu } from '../../components';
-import { getFileReportData } from '../../services/fileReport';
+import { getFileReportData, deleteAllFileData } from '../../services/fileReport';
 
 const FileReportTable = () => {
-	// const queryClient = useQueryClient();
+	const queryClient = useQueryClient();
 
 	const [pageIndex, setPageIndex] = useState(0);
 	const [pageSize, setPageSize] = useState(10);
 	const navigate = useNavigate();
 
+	const [isDeleting, setIsDeleting] = useState(false);
+
 	const handleDelete = (row) => {
 		console.log("Deleting row: ", row);
-		// deleteMutation.mutate(row._id);
+		setIsDeleting(true);
+		deleteMutation.mutate(row.uploadId);
 	};
+
 	const handleView = (row) => {
 		console.log("viewing row: ", row);
 		const logId = row.uploadId;
@@ -28,30 +32,29 @@ const FileReportTable = () => {
 
 	const { data: fetchedData, isLoading, isError, error, refetch } = useQuery({
 		queryKey: ['filereports', pageIndex, pageSize],
-		queryFn: () => getFileReportData({ page: pageIndex + 1, size: pageSize, }),
+		queryFn: () => getFileReportData({ page: pageIndex + 1, size: pageSize }),
 		retry: false,
 		keepPreviousData: true,
 	});
-	//
-	// const deleteMutation = useMutation({
-	// 	mutationFn: (id) => deleteFinancialData(id),
-	// 	onSuccess: () => {
-	// 		toast.success("Record Deleted Successfully");
-	// 		queryClient.invalidateQueries('financials');
-	// 	},
-	// 	onError: (error) => {
-	// 		toast.error(`Error while deleting the record: ${error.message}`);
-	// 	},
-	// });
-	//
+
+	const deleteMutation = useMutation({
+		mutationFn: (id) => deleteAllFileData(id),
+		onSuccess: () => {
+			toast.success("Record Deleted Successfully");
+			queryClient.invalidateQueries('financials');
+			setIsDeleting(false);
+		},
+		onError: (error) => {
+			toast.error(`Error while deleting the record: ${error.message}`);
+			setIsDeleting(false);
+		},
+	});
+
 	useEffect(() => {
 		refetch();
-		// console.log("data inside useEffect: ", fetchedData);
-	}, [pageIndex, pageSize, refetch,]);
-
+	}, [pageIndex, pageSize, refetch]);
 
 	const handlePageSizeChange = (newPageSize) => {
-		// console.log("handlePagesizeChange newPageSize: ", newPageSize);
 		setPageSize(newPageSize);
 		setPageIndex(0); // Reset to the first page when page size changes
 	};
@@ -62,7 +65,6 @@ const FileReportTable = () => {
 
 	return (
 		<div className="flex flex-col gap-4">
-
 			{isLoading ? (
 				<div>Loading...</div>
 			) : isError ? (
@@ -94,6 +96,7 @@ const FileReportTable = () => {
 					</div>
 				</>
 			)}
+			{isDeleting && <div className="text-center mt-4 text-gray-600">Deleting...</div>}
 		</div>
 	);
 };

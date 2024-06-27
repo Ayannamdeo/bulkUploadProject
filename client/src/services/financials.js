@@ -100,3 +100,58 @@ export const deleteFinancialData = async (id) => {
     throw new Error(error.message);
   }
 };
+
+export const createFinancialData = async (newData) => {
+  console.log("newData iside createFinancilData:", newData);
+  try {
+    const token = getToken();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.post(
+      `http://localhost:3000/api/financials/`,
+      newData,
+      config,
+    );
+
+    console.log("data from getFinancialData", data);
+    return data;
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      console.error(error.response.data.message);
+      throw new Error(error.response.data.message);
+    }
+    console.error(error.message);
+    throw new Error(error.message);
+  }
+};
+export const updateFinancialData = async (id, updatedData) => {
+  console.log("formData iside updateFinancilData:", updatedData);
+  try {
+    const token = getToken();
+    const config = {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    const { data } = await axios.patch(
+      `http://localhost:3000/api/financials/${id}`,
+      updatedData,
+      config,
+    );
+
+    console.log("data from getFinancialData", data);
+    return data;
+  } catch (error) {
+    if (error.response && error.response.data.message) {
+      console.error(error.response.data.message);
+      throw new Error(error.response.data.message);
+    }
+    console.error(error.message);
+    throw new Error(error.message);
+  }
+};

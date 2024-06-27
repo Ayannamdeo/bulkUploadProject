@@ -21,10 +21,10 @@ const FinancialsTable = () => {
   const { selectedRow, isModalOpen, openModal, closeModal } = useModal();
   const [modalType, setModalType] = useState(null);
 
-  // const handleAdd = () => {
-  //     setModalType('add');
-  //     openModal();
-  //   };
+  const handleAdd = () => {
+    setModalType('add');
+    openModal();
+  };
 
   const handleView = (row) => {
     setModalType('view');
@@ -39,12 +39,6 @@ const FinancialsTable = () => {
   const handleDelete = (row) => {
     console.log("Deleting row: ", row);
     deleteMutation.mutate(row._id);
-  };
-
-  const handleSave = (newData) => {
-    // Add logic to save new or updated data
-    console.log('Saving data:', newData);
-    closeModal();
   };
 
   const columns = useMemo(() => getColumns(handleView, handleEdit, handleDelete), []);
@@ -166,8 +160,13 @@ const FinancialsTable = () => {
               { id: "US Dollar", caption: "US Dollar" },
             ]}
           />
+          <button
+            onClick={handleAdd}
+            className="rounded-md bg-blue-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-gray-600"
+          >
+            Add Record
+          </button>
         </div>
-
       </div>
       {isLoading ? (
         <div>Loading...</div>
@@ -183,8 +182,8 @@ const FinancialsTable = () => {
           />
 
           <Modal isOpen={isModalOpen} onClose={closeModal}>
-            {modalType === 'add' && <AddFinancial onSave={handleSave} onCancel={closeModal} />}
-            {modalType === 'edit' && selectedRow && <EditFinancial data={selectedRow} onSave={handleSave} onCancel={closeModal} />}
+            {modalType === 'add' && <AddFinancial onClose={closeModal} />}
+            {modalType === 'edit' && selectedRow && <EditFinancial data={selectedRow} onClose={closeModal} />}
             {modalType === 'view' && selectedRow && <ViewFinancial data={selectedRow} onClose={closeModal} />}
           </Modal>
 

@@ -7,7 +7,6 @@ exports.UserRouter = void 0;
 const express_1 = __importDefault(require("express"));
 const Controllers_1 = require("./Controllers");
 const userValidation_1 = require("../../lib/middlewares/userValidation");
-const authMiddleware_1 = require("../../lib/middlewares/authMiddleware");
 class User_Router_Class {
     //Role based authorization
     constructor() {
@@ -24,13 +23,28 @@ class User_Router_Class {
     setupRoutes() {
         this.router.post("/register", userValidation_1.UserValidation.register, this.userControllers.register);
         this.router.post("/login", userValidation_1.UserValidation.login, this.userControllers.login);
-        this.router.get("/", authMiddleware_1.AuthMiddleware.restrictTo(["NORMAL", "ADMIN"]), (req, res) => {
-            return res
-                .status(200)
-                .json({ message: "Accessible by admins and normal users alike" });
-        });
-        this.router.get("/admin", authMiddleware_1.AuthMiddleware.authenticate, authMiddleware_1.AuthMiddleware.restrictTo(["ADMIN"]), this.userControllers.getAllUsers);
-        this.router.delete("/admin/:id", authMiddleware_1.AuthMiddleware.authenticate, authMiddleware_1.AuthMiddleware.restrictTo(["ADMIN"]), this.userControllers.deleteUser);
+        // this.router.get(
+        //   "/",
+        //   AuthMiddleware.restrictTo(["NORMAL", "ADMIN"]),
+        //   (req: Request, res: Response) => {
+        //     return res
+        //       .status(200)
+        //       .json({ message: "Accessible by admins and normal users alike" });
+        //   },
+        // );
+        //
+        // this.router.get(
+        //   "/admin",
+        //   AuthMiddleware.authenticate,
+        //   AuthMiddleware.restrictTo(["ADMIN"]),
+        //   this.userControllers.getAllUsers,
+        // );
+        // this.router.delete(
+        //   "/admin/:id",
+        //   AuthMiddleware.authenticate,
+        //   AuthMiddleware.restrictTo(["ADMIN"]),
+        //   this.userControllers.deleteUser,
+        // );
     }
 }
 const UserRouter = User_Router_Class.getInstance().router;
