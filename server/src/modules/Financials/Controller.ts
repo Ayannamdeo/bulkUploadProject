@@ -95,12 +95,17 @@ class FinancialControllers {
           Number(size),
           logId as string,
         );
+
       if (!data) {
         logger.warn("No ErrorReport data found");
         res.status(404).json({ message: "No ErrorReport data found" });
         return;
       }
+
+      console.log("documentCount", documentCount);
       const totalPages = Math.ceil(documentCount / Number(size));
+      console.log("erroReport:", data);
+      console.log("totalPages", totalPages);
       res.status(200).json({ errorReport: data, totalPages: totalPages });
     } catch (error: any) {
       logger.error("Error while getting all ErrorReport data", error);

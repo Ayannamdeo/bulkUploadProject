@@ -68,7 +68,10 @@ class FinancialControllers {
                     res.status(404).json({ message: "No ErrorReport data found" });
                     return;
                 }
+                console.log("documentCount", documentCount);
                 const totalPages = Math.ceil(documentCount / Number(size));
+                console.log("erroReport:", data);
+                console.log("totalPages", totalPages);
                 res.status(200).json({ errorReport: data, totalPages: totalPages });
             }
             catch (error) {

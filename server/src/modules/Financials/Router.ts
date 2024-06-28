@@ -37,10 +37,7 @@ class Financials_Router_Class {
       this.financialControllers.deleteAllRecords,
     );
 
-    this.router.get(
-      "/errorreport",
-      this.financialControllers.getAllErrorReportData,
-    );
+    this.router.get( "/errorreport", this.financialControllers.getAllErrorReportData,);
 
     this.router.post(
       "/upload",

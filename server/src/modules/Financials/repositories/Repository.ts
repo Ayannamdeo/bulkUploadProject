@@ -107,7 +107,13 @@ class BulkErrorRepository {
     logId: string,
   ): Promise<{ data: IBulkError[] | null; documentCount: number }> => {
     const offset = (page - 1) * limit;
-    const documentCount = await BULK_ERROR_REPORT.countDocuments();
+    const documentCount = await BULK_ERROR_REPORT.countDocuments({
+      uploadId: logId,
+    });
+    console.log(
+      "inside bulkErrorReport Repository documentCounts: ",
+      documentCount,
+    );
     const data = await BULK_ERROR_REPORT.find({ uploadId: logId })
       .skip(offset)
       .limit(limit);

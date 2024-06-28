@@ -162,7 +162,7 @@ const FinancialsTable = () => {
           />
           <button
             onClick={handleAdd}
-            className="rounded-md bg-blue-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-blue-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-gray-600"
+            className="rounded-md bg-blue-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-lg shadow-gray-400 hover:bg-blue-gray-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-gray-600"
           >
             Add Record
           </button>

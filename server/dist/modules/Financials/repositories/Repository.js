@@ -84,7 +84,10 @@ class BulkErrorRepository {
         });
         this.getAllErrorReport = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, logId) {
             const offset = (page - 1) * limit;
-            const documentCount = yield models_3.BULK_ERROR_REPORT.countDocuments();
+            const documentCount = yield models_3.BULK_ERROR_REPORT.countDocuments({
+                uploadId: logId,
+            });
+            console.log("inside bulkErrorReport Repository documentCounts: ", documentCount);
             const data = yield models_3.BULK_ERROR_REPORT.find({ uploadId: logId })
                 .skip(offset)
                 .limit(limit);
