@@ -3,3 +3,4 @@
 app.log
 /public
 /uploads
+./csv-generator/node_modules/
