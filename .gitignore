@@ -1,6 +1,4 @@
 /node_modules
 .env
 app.log
-/public
-/uploads
-./csv-generator/node_modules/
+# TODO: /public/uploads  make the contents of uploads be ignored and not the directory itself
