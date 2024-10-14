@@ -15,25 +15,41 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
 const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+// import helmet from "helmet";
 const cors_1 = __importDefault(require("cors"));
-const child_process_1 = require("child_process");
-const util_1 = require("util");
 const DB_Connection_1 = require("./lib/db/DB_Connection");
 const routes_1 = __importDefault(require("./routes/routes"));
 const logger_1 = require("./lib/helpers/logger");
 const reqLogger_1 = require("./lib/middlewares/reqLogger");
-const execAsync = (0, util_1.promisify)(child_process_1.exec);
+// const execAsync = promisify(exec);
 class Server {
     constructor(config) {
+        // private configureErrorHandler(): void {
+        //   this.app.use(errorHandler);
+        // }
+        // private async killProcessOnPort(port: number): Promise<void> {
+        //   try {
+        //     const { stdout } = await execAsync(`lsof -i :${port} -t`);
+        //     if (stdout) {
+        //       await execAsync(`lsof -i :${port} -t | xargs kill -9`);
+        //       logger.info(`Successfully killed process on port ${port}`);
+        //     } else {
+        //       logger.info(`No process found on port ${port}`);
+        //     }
+        //   } catch (error: any) {
+        //     logger.error(`Error killing process on port ${port}: ${error.message}`);
+        //     throw error;
+        //   }
+        // }
         this.connectDB = () => __awaiter(this, void 0, void 0, function* () {
-            yield this.db.connect().catch((err) => console.log(err));
+            yield this.db.connect();
         });
         this.disconnectDB = () => __awaiter(this, void 0, void 0, function* () {
-            yield this.db.disconnect().catch((err) => console.log(err));
+            yield this.db.disconnect();
         });
         this.run = () => __awaiter(this, void 0, void 0, function* () {
             yield this.connectDB();
-            logger_1.logger.info("after connectDB");
+            logger_1.logger.info("after connectDB()");
             // this.app.listen(this.config.port, () => {
             //   logger.info(`Node server started at port: ${this.config.port}`);
             // });
@@ -41,24 +57,28 @@ class Server {
                 const server = this.app.listen(this.config.port, () => {
                     logger_1.logger.info(`Node server started at port: ${this.config.port}`);
                 });
-                server.on("error", (error) => __awaiter(this, void 0, void 0, function* () {
-                    if (error.code === "EADDRINUSE") {
-                        logger_1.logger.warn(`Port ${this.config.port} is already in use, attempting to kill the process using it.`);
-                        try {
-                            yield this.killProcessOnPort(this.config.port);
-                            logger_1.logger.info(`Successfully killed process on port ${this.config.port}, retrying to start server.`);
-                            setTimeout(startServer, 1000); // Introduce a delay before restarting
-                        }
-                        catch (killError) {
-                            logger_1.logger.error(`Failed to kill process on port ${this.config.port}: ${killError.message}`);
-                            process.exit(1);
-                        }
-                    }
-                    else {
-                        logger_1.logger.error(`Server error: ${error.message}`);
-                        throw error;
-                    }
-                }));
+                // server.on("error", async (error: any) => {
+                //   if (error.code === "EADDRINUSE") {
+                //     logger.warn(
+                //       `Port ${this.config.port} is already in use, attempting to kill the process using it.`,
+                //     );
+                //     try {
+                //       await this.killProcessOnPort(this.config.port);
+                //       logger.info(
+                //         `Successfully killed process on port ${this.config.port}, retrying to start server.`,
+                //       );
+                //       setTimeout(startServer, 1000); // Introduce a delay before restarting
+                //     } catch (killError: any) {
+                //       logger.error(
+                //         `Failed to kill process on port ${this.config.port}: ${killError.message}`,
+                //       );
+                //       process.exit(1);
+                //     }
+                //   } else {
+                //     logger.error(`Server error: ${error.message}`);
+                //     throw error;
+                //   }
+                // });
             };
             startServer();
         });
@@ -68,7 +88,6 @@ class Server {
     }
     static getInstance(config) {
         if (!Server.instance) {
-            console.log("inside getInstance of Server//////////////////");
             Server.instance = new Server(config);
             Server.instance.bootstrap();
         }
@@ -89,27 +108,6 @@ class Server {
     }
     configureRoutes() {
         this.app.use(routes_1.default);
-    }
-    // private configureErrorHandler(): void {
-    //   this.app.use(errorHandler);
-    // }
-    killProcessOnPort(port) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const { stdout } = yield execAsync(`lsof -i :${port} -t`);
-                if (stdout) {
-                    yield execAsync(`lsof -i :${port} -t | xargs kill -9`);
-                    logger_1.logger.info(`Successfully killed process on port ${port}`);
-                }
-                else {
-                    logger_1.logger.info(`No process found on port ${port}`);
-                }
-            }
-            catch (error) {
-                logger_1.logger.error(`Error killing process on port ${port}: ${error.message}`);
-                throw error;
-            }
-        });
     }
 }
 exports.Server = Server;

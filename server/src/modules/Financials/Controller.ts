@@ -20,7 +20,6 @@ class FinancialControllers {
       sortBy = "createdAt",
       sortDirection = "desc",
     } = req.query;
-    console.log("size from getAll Data: ", size);
 
     try {
       const financeList = await this.financialServices.getAllFinancials(
@@ -46,10 +45,7 @@ class FinancialControllers {
     }
   };
 
-  getAllBulkUploadReportData = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
+  getAllBulkUploadReportData = async ( req: Request, res: Response,): Promise<void> => {
     const {
       page = 1,
       size = 10,
@@ -59,12 +55,7 @@ class FinancialControllers {
 
     try {
       const { data, documentCount } =
-        await this.financialServices.getAllBulkUploadReport(
-          Number(page),
-          Number(size),
-          sortBy as string,
-          sortDirection as string,
-        );
+        await this.financialServices.getAllBulkUploadReport( Number(page), Number(size), sortBy as string, sortDirection as string,);
       if (!data) {
         logger.warn("No BulkUploadReport data found");
         res.status(404).json({ message: "No BulkUploadReport data found" });
@@ -81,12 +72,9 @@ class FinancialControllers {
     }
   };
 
-  getAllErrorReportData = async (
-    req: Request,
-    res: Response,
-  ): Promise<void> => {
+  getAllErrorReportData = async ( req: Request, res: Response,): Promise<void> => {
     const { page = 1, size = 10, logId } = req.query;
-    console.log("inside getAllErrorReportData logId", logId);
+    // console.log("inside getAllErrorReportData logId", logId);
 
     try {
       const { data, documentCount } =
@@ -102,10 +90,7 @@ class FinancialControllers {
         return;
       }
 
-      console.log("documentCount", documentCount);
       const totalPages = Math.ceil(documentCount / Number(size));
-      console.log("erroReport:", data);
-      console.log("totalPages", totalPages);
       res.status(200).json({ errorReport: data, totalPages: totalPages });
     } catch (error: any) {
       logger.error("Error while getting all ErrorReport data", error);
@@ -114,7 +99,6 @@ class FinancialControllers {
   };
 
   searchData = async (req: Request, res: Response): Promise<void> => {
-    console.log("inside search dAta");
 
     try {
       const { searchResults, totalDocuments } =
@@ -133,10 +117,8 @@ class FinancialControllers {
 
   createData = async (req: Request, res: Response): Promise<void> => {
     try {
-      console.log("req.body inside createData: ", req.body);
-      const createdData = await this.financialServices.CreateFinancials(
-        req.body,
-      );
+      // console.log("req.body inside createData: ", req.body);
+      const createdData = await this.financialServices.CreateFinancials( req.body,);
       if (Array.isArray(createdData)) {
         res.status(400).json({ message: createdData });
         return;
@@ -169,7 +151,7 @@ class FinancialControllers {
   };
 
   deleteData = async (req: Request, res: Response): Promise<void> => {
-    console.log("id in params: ", req.params.id);
+    // console.log("id in params: ", req.params.id);
     try {
       const deletedContent = await this.financialServices.deleteFinancials(
         req.params.id,
@@ -183,30 +165,21 @@ class FinancialControllers {
 
   deleteAllRecords = async (req: Request, res: Response): Promise<void> => {
     try {
-      console.log("req.body inside deleAllRecordes", req.body);
-      console.log("req.headers inside deleAllRecordes", req.headers);
+      // console.log("req.body inside deleAllRecordes", req.body);
+      // console.log("req.headers inside deleAllRecordes", req.headers);
 
-      const report =
-        await this.financialServices.findBulkUploadReportByUploadId(
-          req.body.uploadId,
-        );
+      const report = await this.financialServices.findBulkUploadReportByUploadId( req.body.uploadId,);
       if (report) {
         if (report.userEmail === req.headers["user-agent"]) {
-          const response = await this.financialServices.deleteBulk(
-            req.body.uploadId,
-          );
+          const response = await this.financialServices.deleteBulk(req.body.uploadId);
           res.status(200).json(response);
           return;
         } else {
-          res.status(400).json({
-            message: "user not Authorized to delete this file Report Data",
-          });
+          res.status(400).json({ message: "user not Authorized to delete this file Report Data" });
           return;
         }
       }
-      res
-        .status(404)
-        .json({ message: "No report by the request UploadId data found" });
+      res.status(404).json({ message: "No report by the request UploadId data found" });
       return;
     } catch (err: any) {
       logger.error("error in deleteAllRecords Api", err);
@@ -221,20 +194,12 @@ class FinancialControllers {
       const fileSize: number | undefined = req.file?.size;
       const formattedFileSize = formatFileSize(fileSize as number);
       const userEmail = req.body.userEmail;
-      console.log("filesize", formattedFileSize);
-      console.log("userEmail", userEmail);
-      console.log("req.body", req.body);
       if (!filePath) {
         res.status(400).json({ message: "no file uploaded" });
         return;
       }
-      const response = await this.financialServices.uploadCsvFile(
-        fileName as string,
-        filePath,
-        formattedFileSize,
-        userEmail,
-      );
-      console.log("response in controller", response);
+      const response = await this.financialServices.uploadCsvFile( fileName as string, filePath, formattedFileSize, userEmail);
+      logger.info("response in controller", response);
       res.status(201).json({ message: response });
       return;
     } catch (error: any) {

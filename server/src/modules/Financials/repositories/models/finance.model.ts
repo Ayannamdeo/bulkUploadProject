@@ -1,4 +1,3 @@
-import { string } from "joi";
 import { IFinance } from "../../entities";
 import mongoose from "mongoose";
 
@@ -13,11 +12,7 @@ const financeSchema: mongoose.Schema<IFinance> = new mongoose.Schema<IFinance>(
     accountNumber: { type: String, length: 8, required: true },
     accountName: { type: String, required: true },
     amount: { type: String, required: true },
-    currencyName: {
-      type: String,
-      enum: ["US Dollar", "Indian Rupee", "Yen", "Euro"],
-      required: true,
-    },
+    currencyName: { type: String, enum: ["US Dollar", "Indian Rupee", "Yen", "Euro"], required: true },
     jobTitle: { type: String, required: true },
     phoneNumber: { type: String, required: true },
     companyName: { type: String, required: true },

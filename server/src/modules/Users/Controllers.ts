@@ -37,7 +37,6 @@ class UserControllers {
   login = async (req: Request, res: Response): Promise<void> => {
     try {
       const user: IUserLogin = req.body;
-      // console.log(req.body);
 
       const existingUser: IUser | null = await this.userServices.getUserByEmail(
         user.email,

@@ -37,7 +37,6 @@ class UserControllers {
         this.login = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = req.body;
-                // console.log(req.body);
                 const existingUser = yield this.userServices.getUserByEmail(user.email);
                 if (!existingUser) {
                     res.status(404).json({ message: "No user found for current Email" });

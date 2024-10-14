@@ -50,9 +50,7 @@ class FinancialRepository {
     return await FINANCIAL_MODEL.countDocuments();
   };
 
-  public search = async (
-    pipeline: PipelineStage[],
-  ): Promise<AggregationResult[]> => {
+  public search = async ( pipeline: PipelineStage[],): Promise<AggregationResult[]> => {
     return await FINANCIAL_MODEL.aggregate(pipeline).exec();
   };
 
@@ -66,9 +64,7 @@ class BulkUploadReportRepository {
     return await BULK_UPLOAD_REPORT.create(data);
   };
 
-  public getBulkUploadReportByUploadId = async (
-    id: string,
-  ): Promise<IBulkUpload | null> => {
+  public getBulkUploadReportByUploadId = async ( id: string,): Promise<IBulkUpload | null> => {
     return await BULK_UPLOAD_REPORT.findOne({ uploadId: id });
   };
 
@@ -101,19 +97,11 @@ class BulkErrorRepository {
     return await BULK_ERROR_REPORT.deleteMany({ uploadId: id });
   };
 
-  public getAllErrorReport = async (
-    page: number = 1,
-    limit: number = 10,
-    logId: string,
+  public getAllErrorReport = async ( page: number = 1, limit: number = 10, logId: string,
   ): Promise<{ data: IBulkError[] | null; documentCount: number }> => {
     const offset = (page - 1) * limit;
-    const documentCount = await BULK_ERROR_REPORT.countDocuments({
-      uploadId: logId,
-    });
-    console.log(
-      "inside bulkErrorReport Repository documentCounts: ",
-      documentCount,
-    );
+    const documentCount = await BULK_ERROR_REPORT.countDocuments({ uploadId: logId });
+    // console.log( "inside bulkErrorReport Repository documentCounts: ", documentCount,);
     const data = await BULK_ERROR_REPORT.find({ uploadId: logId })
       .skip(offset)
       .limit(limit);
