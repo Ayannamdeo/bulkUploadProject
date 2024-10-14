@@ -11,6 +11,35 @@ class UserControllers {
     this.userServices = new UserServices();
   }
 
+/**
+   * @swagger
+   * /api/users/register:
+   *   post:
+   *     summary: Register a new user
+   *     tags:
+   *       - Users
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               name:
+   *                 type: string
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               password:
+   *                 type: string
+   *     responses:
+   *       201:
+   *         description: User registered successfully
+   *       401:
+   *         description: User already exists
+   *       500:
+   *         description: Internal server error
+   */
   register = async (req: Request, res: Response): Promise<void> => {
     try {
       const newUser: IUser = req.body;
@@ -34,6 +63,48 @@ class UserControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/users/login:
+   *   post:
+   *     summary: Log in an existing user
+   *     tags:
+   *       - Users
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 format: email
+   *               password:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: User logged in successfully
+   *         content:
+   *           application/json:
+   *             schema:
+   *               type: object
+   *               properties:
+   *                 token:
+   *                   type: string
+   *                 email:
+   *                   type: string
+   *                 name:
+   *                   type: string
+   *                 id:
+   *                   type: string
+   *       404:
+   *         description: No user found for the current email
+   *       401:
+   *         description: Invalid credentials
+   *       500:
+   *         description: Internal server error
+   */
   login = async (req: Request, res: Response): Promise<void> => {
     try {
       const user: IUserLogin = req.body;
@@ -77,6 +148,21 @@ class UserControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/users:
+   *   get:
+   *     summary: Get all users
+   *     tags:
+   *       - Users
+   *     responses:
+   *       200:
+   *         description: List of all users
+   *       404:
+   *         description: No users found
+   *       500:
+   *         description: Internal server error
+   */
   getAllUsers = async (req: Request, res: Response): Promise<void> => {
     try {
       const userList = await this.userServices.getAllUsers();
@@ -93,6 +179,27 @@ class UserControllers {
     }
   };
 
+  /**
+   * @swagger
+   * /api/users/delete/{id}:
+   *   delete:
+   *     summary: Delete a user by ID
+   *     tags:
+   *       - Users
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: User deleted successfully
+   *       404:
+   *         description: No user found with the specified ID
+   *       500:
+   *         description: Internal server error
+   */
   deleteUser = async (req: Request, res: Response): Promise<any> => {
     try {
       const deletedUser = await this.userServices.deleteUser(

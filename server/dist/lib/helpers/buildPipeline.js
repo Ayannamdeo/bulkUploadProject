@@ -3,7 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.buildPipeline = void 0;
 const buildSearchMatchStage = (query) => {
     const searchQuery = query["globalFilter"];
-    console.log("searchFilter inside buildpipline: ", searchQuery);
+    // console.log("searchFilter inside buildpipline: ", searchQuery);
     return searchQuery.trim() !== ""
         ? [
             {
@@ -16,7 +16,7 @@ const buildSearchMatchStage = (query) => {
 };
 const buildCurrencyFilterStage = (query) => {
     const currencyFilter = query["currencyFilter"];
-    console.log("currencyFilter inside buildpipline: ", currencyFilter);
+    // console.log("currencyFilter inside buildpipline: ", currencyFilter);
     if (currencyFilter) {
         return [{ $match: { currencyName: `${currencyFilter}` } }];
     }
@@ -24,7 +24,7 @@ const buildCurrencyFilterStage = (query) => {
 };
 const buildAccountNameFilterStage = (query) => {
     const accountName = query["accountNameFilter"];
-    console.log("accountNameFilter inside buildpipline: ", accountName);
+    // console.log("accountNameFilter inside buildpipline: ", accountName);
     if (accountName) {
         return [{ $match: { accountName: `${accountName}` } }];
     }

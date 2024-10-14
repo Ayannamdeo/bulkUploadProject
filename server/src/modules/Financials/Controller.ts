@@ -13,6 +13,46 @@ class FinancialControllers {
     this.financialServices = new FinancialServices();
   }
 
+/**
+ * @swagger
+ * /api/financials/:
+ *   get:
+ *     summary: Get Financials Table
+ *     tags:
+ *       - Financials
+ *     parameters:
+ *       - name: page
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *       - name: size
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *       - name: sortBy
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: "createdAt"
+ *       - name: sortDirection
+ *         in: query
+ *         required: false
+ *         schema:
+ *           type: string
+ *           default: "desc"
+ *     responses:
+ *       200:
+ *         description: A list of financial data
+ *       404:
+ *         description: No financial data found
+ *       500:
+ *         description: Internal server error
+ */
   getAllData = async (req: Request, res: Response): Promise<void> => {
     const {
       page = 1,
@@ -45,6 +85,46 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/filereport:
+   *   get:
+   *     summary: Get all csvFile Upload report data
+   *     tags:
+   *       - Financials
+   *     parameters:
+   *       - name: page
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: integer
+   *           default: 1
+   *       - name: size
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: integer
+   *           default: 10
+   *       - name: sortBy
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: string
+   *           default: "createdAt"
+   *       - name: sortDirection
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: string
+   *           default: "desc"
+   *     responses:
+   *       200:
+   *         description: A list of bulk upload report data
+   *       404:
+   *         description: No BulkUploadReport data found
+   *       500:
+   *         description: Internal server error
+   */
   getAllBulkUploadReportData = async ( req: Request, res: Response,): Promise<void> => {
     const {
       page = 1,
@@ -72,9 +152,41 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/errorreport:
+   *   get:
+   *     summary: Get all error report data
+   *     tags:
+   *       - Financials
+   *     parameters:
+   *       - name: page
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: integer
+   *           default: 1
+   *       - name: size
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: integer
+   *           default: 10
+   *       - name: logId
+   *         in: query
+   *         required: false
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: A list of error report data
+   *       404:
+   *         description: No ErrorReport data found
+   *       500:
+   *         description: Internal server error
+   */
   getAllErrorReportData = async ( req: Request, res: Response,): Promise<void> => {
     const { page = 1, size = 10, logId } = req.query;
-    // console.log("inside getAllErrorReportData logId", logId);
 
     try {
       const { data, documentCount } =
@@ -98,8 +210,26 @@ class FinancialControllers {
     }
   };
 
+  /**
+   * @swagger
+   * /api/financials/search:
+   *   get:
+   *     summary: Search financial data
+   *     tags:
+   *       - Financials
+   *     parameters:
+   *       - name: query
+   *         in: query
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: A list of search results
+   *       500:
+   *         description: Internal server error
+   */
   searchData = async (req: Request, res: Response): Promise<void> => {
-
     try {
       const { searchResults, totalDocuments } =
         await this.financialServices.searchFinancials(req.query);
@@ -115,9 +245,58 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/:
+   *   post:
+   *     summary: Create new financial data
+   *     tags:
+   *       - Financials
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               name:
+   *                 type: string
+   *               amount:
+   *                 type: number
+   *               uploadId: 
+   *                 type: string
+   *               age: 
+   *                 type: number
+   *               sex: 
+   *                 type: string
+   *               country: 
+   *                 type: string
+   *               city: 
+   *                 type: string
+   *               accountNumber: 
+   *                 type: string
+   *               accountName: 
+   *                 type: string
+   *               currencyName: 
+   *                 type: string
+   *               jobTitle: 
+   *                 type: string
+   *               phoneNumber: 
+   *                 type: string
+   *               companyName: 
+   *                 type: string
+   *               transactionDescription: 
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Created financial data
+   *       400:
+   *         description: Bad request
+   *       500:
+   *         description: Internal server error
+   */
   createData = async (req: Request, res: Response): Promise<void> => {
     try {
-      // console.log("req.body inside createData: ", req.body);
       const createdData = await this.financialServices.CreateFinancials( req.body,);
       if (Array.isArray(createdData)) {
         res.status(400).json({ message: createdData });
@@ -130,10 +309,66 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/{id}:
+   *   put:
+   *     summary: Update financial data by ID
+   *     tags:
+   *       - Financials
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         schema:
+   *           type: string
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               name:
+   *                 type: string
+   *               amount:
+   *                 type: number
+   *               uploadId: 
+   *                 type: string
+   *               age: 
+   *                 type: number
+   *               sex: 
+   *                 type: string
+   *               country: 
+   *                 type: string
+   *               city: 
+   *                 type: string
+   *               accountNumber: 
+   *                 type: string
+   *               accountName: 
+   *                 type: string
+   *               currencyName: 
+   *                 type: string
+   *               jobTitle: 
+   *                 type: string
+   *               phoneNumber: 
+   *                 type: string
+   *               companyName: 
+   *                 type: string
+   *               transactionDescription: 
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Updated financial data
+   *       400:
+   *         description: Bad request
+   *       404:
+   *         description: Financial data not found
+   *       500:
+   *         description: Internal server error
+   */
   updateData = async (req: Request, res: Response): Promise<void> => {
     try {
-      // console.log("req.body inside createData: ", req.body);
-      // console.log(" req.params inside createData: ", req.params);
       const updatedData = await this.financialServices.UpdateFinancials(
         req.params.id,
         req.body,
@@ -150,6 +385,27 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/{id}:
+   *   delete:
+   *     summary: Delete financial data by ID
+   *     tags:
+   *       - Financials
+   *     parameters:
+   *       - name: id
+   *         in: path
+   *         required: true
+   *         schema:
+   *           type: string
+   *     responses:
+   *       200:
+   *         description: Deleted financial data
+   *       404:
+   *         description: Financial data not found
+   *       500:
+   *         description: Internal server error
+   */
   deleteData = async (req: Request, res: Response): Promise<void> => {
     // console.log("id in params: ", req.params.id);
     try {
@@ -163,11 +419,34 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/filereport:
+   *   delete:
+   *     summary: Delete all records associated with a specific upload ID
+   *     tags:
+   *       - Financials
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               uploadId:
+   *                 type: string
+   *     responses:
+   *       200:
+   *         description: Deleted records successfully
+   *       400:
+   *         description: User not authorized or bad request
+   *       404:
+   *         description: No report found by the requested UploadId
+   *       500:
+   *         description: Internal server error
+   */
   deleteAllRecords = async (req: Request, res: Response): Promise<void> => {
     try {
-      // console.log("req.body inside deleAllRecordes", req.body);
-      // console.log("req.headers inside deleAllRecordes", req.headers);
-
       const report = await this.financialServices.findBulkUploadReportByUploadId( req.body.uploadId,);
       if (report) {
         if (report.userEmail === req.headers["user-agent"]) {
@@ -187,6 +466,33 @@ class FinancialControllers {
     }
   };
 
+/**
+   * @swagger
+   * /api/financials/upload:
+   *   post:
+   *     summary: Upload a CSV file
+   *     tags:
+   *       - Financials
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         multipart/form-data:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               userEmail:
+   *                 type: string
+   *               file:
+   *                 type: string
+   *                 format: binary
+   *     responses:
+   *       201:
+   *         description: File uploaded successfully
+   *       400:
+   *         description: No file uploaded
+   *       500:
+   *         description: Internal server error
+   */
   uploadFile = async (req: Request, res: Response): Promise<void> => {
     try {
       const fileName: string | undefined = req.file?.originalname;

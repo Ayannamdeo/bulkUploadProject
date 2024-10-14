@@ -71,16 +71,11 @@ class FinancialServices {
             return yield this.financialRepository.countAll();
         });
         this.searchFinancials = (query) => __awaiter(this, void 0, void 0, function* () {
-            console.log("query inside searchFiancials: ", query);
             const pipeline = (0, buildPipeline_1.buildPipeline)(query);
-            console.log("searchfinancials pipeline ", pipeline);
             const [response] = yield this.financialRepository.search(pipeline);
-            console.log("searchfinancials response after await ", response);
             // Extract search results and count from the response
             const searchResults = response.searchResults || [];
-            const totalDocuments = response.countResults.length > 0
-                ? response.countResults[0].totalDocuments
-                : 0;
+            const totalDocuments = response.countResults.length > 0 ? response.countResults[0].totalDocuments : 0;
             return { searchResults, totalDocuments };
         });
         this.getAllBulkUploadReport = (...args_2) => __awaiter(this, [...args_2], void 0, function* (page = 1, limit = 10, sortBy = "createdAt", sortDirection = "desc") {

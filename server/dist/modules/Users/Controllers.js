@@ -15,6 +15,35 @@ const config_1 = require("../../config");
 const logger_1 = require("../../lib/helpers/logger");
 class UserControllers {
     constructor() {
+        /**
+           * @swagger
+           * /api/users/register:
+           *   post:
+           *     summary: Register a new user
+           *     tags:
+           *       - Users
+           *     requestBody:
+           *       required: true
+           *       content:
+           *         application/json:
+           *           schema:
+           *             type: object
+           *             properties:
+           *               name:
+           *                 type: string
+           *               email:
+           *                 type: string
+           *                 format: email
+           *               password:
+           *                 type: string
+           *     responses:
+           *       201:
+           *         description: User registered successfully
+           *       401:
+           *         description: User already exists
+           *       500:
+           *         description: Internal server error
+           */
         this.register = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const newUser = req.body;
@@ -34,6 +63,48 @@ class UserControllers {
                 res.status(500).json({ error: error.message });
             }
         });
+        /**
+           * @swagger
+           * /api/users/login:
+           *   post:
+           *     summary: Log in an existing user
+           *     tags:
+           *       - Users
+           *     requestBody:
+           *       required: true
+           *       content:
+           *         application/json:
+           *           schema:
+           *             type: object
+           *             properties:
+           *               email:
+           *                 type: string
+           *                 format: email
+           *               password:
+           *                 type: string
+           *     responses:
+           *       200:
+           *         description: User logged in successfully
+           *         content:
+           *           application/json:
+           *             schema:
+           *               type: object
+           *               properties:
+           *                 token:
+           *                   type: string
+           *                 email:
+           *                   type: string
+           *                 name:
+           *                   type: string
+           *                 id:
+           *                   type: string
+           *       404:
+           *         description: No user found for the current email
+           *       401:
+           *         description: Invalid credentials
+           *       500:
+           *         description: Internal server error
+           */
         this.login = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const user = req.body;
@@ -67,6 +138,21 @@ class UserControllers {
                     .json({ error: error.message, message: "Error while logging in..." });
             }
         });
+        /**
+           * @swagger
+           * /api/users:
+           *   get:
+           *     summary: Get all users
+           *     tags:
+           *       - Users
+           *     responses:
+           *       200:
+           *         description: List of all users
+           *       404:
+           *         description: No users found
+           *       500:
+           *         description: Internal server error
+           */
         this.getAllUsers = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const userList = yield this.userServices.getAllUsers();
@@ -83,6 +169,27 @@ class UserControllers {
                 res.status(500).json({ message: error.message });
             }
         });
+        /**
+         * @swagger
+         * /api/users/delete/{id}:
+         *   delete:
+         *     summary: Delete a user by ID
+         *     tags:
+         *       - Users
+         *     parameters:
+         *       - name: id
+         *         in: path
+         *         required: true
+         *         schema:
+         *           type: string
+         *     responses:
+         *       200:
+         *         description: User deleted successfully
+         *       404:
+         *         description: No user found with the specified ID
+         *       500:
+         *         description: Internal server error
+         */
         this.deleteUser = (req, res) => __awaiter(this, void 0, void 0, function* () {
             try {
                 const deletedUser = yield this.userServices.deleteUser(Number(req.params.id));

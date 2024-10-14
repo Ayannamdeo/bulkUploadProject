@@ -10,6 +10,7 @@ import { DB_Connection } from "./lib/db/DB_Connection";
 import router from "./routes/routes";
 import { logger } from "./lib/helpers/logger";
 import { ReqLoggger } from "./lib/middlewares/reqLogger";
+import { swaggerUi, swaggerDocs } from "./config/swaggerConfig";
 
 // const execAsync = promisify(exec);
 
@@ -46,6 +47,8 @@ class Server {
     this.app.use(express.urlencoded({ extended: false }));
     this.app.use(express.json());
     this.app.use(cookieParser());
+
+    this.app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
   }
 
   private configureRoutes(): void {

@@ -21,6 +21,7 @@ const DB_Connection_1 = require("./lib/db/DB_Connection");
 const routes_1 = __importDefault(require("./routes/routes"));
 const logger_1 = require("./lib/helpers/logger");
 const reqLogger_1 = require("./lib/middlewares/reqLogger");
+const swaggerConfig_1 = require("./config/swaggerConfig");
 // const execAsync = promisify(exec);
 class Server {
     constructor(config) {
@@ -105,6 +106,7 @@ class Server {
         this.app.use(express_1.default.urlencoded({ extended: false }));
         this.app.use(express_1.default.json());
         this.app.use((0, cookie_parser_1.default)());
+        this.app.use("/api-docs", swaggerConfig_1.swaggerUi.serve, swaggerConfig_1.swaggerUi.setup(swaggerConfig_1.swaggerDocs));
     }
     configureRoutes() {
         this.app.use(routes_1.default);
