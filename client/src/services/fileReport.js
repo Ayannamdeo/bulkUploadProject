@@ -1,6 +1,8 @@
 import { getToken } from "../utils/helpers/auth";
 import axios from "axios";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const getFileReportData = async ({
   page = 0,
   size = 10,
@@ -9,11 +11,11 @@ export const getFileReportData = async ({
 }) => {
   try {
     console.log("inside getFileReportData");
-    const token = getToken();
+    // const token = getToken();
     const config = {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      // headers: {
+      //   Authorization: `Bearer ${token}`,
+      // },
       params: {
         page,
         size,
@@ -23,7 +25,7 @@ export const getFileReportData = async ({
     };
 
     const { data } = await axios.get(
-      "http://localhost:3000/api/financials/filereport",
+      `${API_URL}/financials/filereport`,
       config,
     );
 
@@ -50,7 +52,7 @@ export const deleteAllFileData = async (uploadId) => {
     };
 
     const { data } = await axios.delete(
-      `http://localhost:3000/api/financials/filereport`,
+      `${API_URL}/financials/filereport`,
       config,
     );
 

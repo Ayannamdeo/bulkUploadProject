@@ -1,6 +1,8 @@
 import axios from "axios";
 import { getToken } from "../utils/helpers/auth";
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 export const uploadFile = async (formData, userEmail) => {
   try {
     const token = getToken();
@@ -13,7 +15,7 @@ export const uploadFile = async (formData, userEmail) => {
     };
 
     const response = await axios.post(
-      "http://localhost:3000/api/financials/upload",
+      `${API_URL}/financials/upload`,
       formData,
       config,
     );

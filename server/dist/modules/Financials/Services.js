@@ -65,7 +65,8 @@ class FinancialServices {
         this.deleteBulk = (id) => __awaiter(this, void 0, void 0, function* () {
             const r1 = yield this.bulkErrorRepository.deleteAllErrorReports(id);
             const r2 = yield this.financialRepository.deleteManyRecords(id);
-            return { r1, r2 };
+            const r3 = yield this.bulkUploadReportRepository.deleteBulkUploadReport(id);
+            return { r1, r2, r3 };
         });
         this.countAllFinancials = () => __awaiter(this, void 0, void 0, function* () {
             return yield this.financialRepository.countAll();
@@ -75,7 +76,9 @@ class FinancialServices {
             const [response] = yield this.financialRepository.search(pipeline);
             // Extract search results and count from the response
             const searchResults = response.searchResults || [];
-            const totalDocuments = response.countResults.length > 0 ? response.countResults[0].totalDocuments : 0;
+            const totalDocuments = response.countResults.length > 0
+                ? response.countResults[0].totalDocuments
+                : 0;
             return { searchResults, totalDocuments };
         });
         this.getAllBulkUploadReport = (...args_2) => __awaiter(this, [...args_2], void 0, function* (page = 1, limit = 10, sortBy = "createdAt", sortDirection = "desc") {

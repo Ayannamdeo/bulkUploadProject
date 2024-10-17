@@ -1,42 +1,32 @@
-import { useMemo, useEffect, useState } from 'react';
+import { useMemo, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-import { getColumns } from './container/getColumns';
-import { GlobalSearch, CurrencyFilter, AccountNameFilter, AddFinancial, EditFinancial, ViewFinancial } from './container';
-import { Modal, TableComponent, PageSizeMenu, PaginationNav } from '../../components';
-import { getFinancialData, deleteFinancialData } from '../../services/financials';
-import useModal from '../../hooks/useModal';
+import { getColumns } from "./container/getColumns";
+import { GlobalSearch, CurrencyFilter, AccountNameFilter, AddFinancial, EditFinancial, ViewFinancial, } from "./container";
+import { Modal, TableComponent, PageSizeMenu, PaginationNav, } from "../../components";
+import { getFinancialData, deleteFinancialData, } from "../../services/financials";
+import { useModal } from "../../hooks/useModal";
+import { useFinancialsHandler } from "../../hooks/useFinancialsHandler";
+import { isAuthenticated } from "../../utils/helpers/auth";
 
 const FinancialsTable = () => {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
-  const [pageIndex, setPageIndex] = useState(0);
-  const [pageSize, setPageSize] = useState(10);
-  const [sortBy, setSortBy] = useState({ id: 'createdAt', desc: true }); // Initial sorting by createdAt in descending order
-  const [globalFilter, setGlobalFilter] = useState('');
-  const [currencyFilter, setCurrencyFilter] = useState('');
-  const [accountNameFilter, setAccountNameFilter] = useState('');
-
-  const { selectedRow, isModalOpen, openModal, closeModal } = useModal();
-  const [modalType, setModalType] = useState(null);
-
-  const handleAdd = () => {
-    setModalType('add');
-    openModal();
-  };
-
-  const handleView = (row) => {
-    setModalType('view');
-    openModal(row);
-  };
-
-  const handleEdit = (row) => {
-    setModalType('edit');
-    openModal(row);
-  };
+  const { selectedRow, isModalOpen, closeModal, handleAdd, handleView, handleEdit, modalType, } = useModal();
+  const { handleGlobalFilterChange, handleSortChange, handleCurrencyChange, handlePageSizeChange, handleAccountNameChange,
+    gotoPage, pageIndex, pageSize, globalFilter, currencyFilter, accountNameFilter, sortBy } = useFinancialsHandler();
 
   const handleDelete = (row) => {
+    const isAuth = isAuthenticated();
+    if (!isAuth){
+      //redirect user to login page
+      toast.error("Please login to perform  this action.");
+      navigate("/login");
+      return;
+    }
     console.log("Deleting row: ", row);
     deleteMutation.mutate(row._id);
   };
@@ -44,16 +34,18 @@ const FinancialsTable = () => {
   const columns = useMemo(() => getColumns(handleView, handleEdit, handleDelete), []);
 
   const { data: fetchedData, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['financials', pageIndex, pageSize, sortBy],
-    queryFn: () => getFinancialData({
-      page: pageIndex + 1, // API pages are usually 1-based
-      size: pageSize,
-      sortBy: sortBy.id,
-      sortDirection: sortBy.desc === null ? null : (sortBy.desc ? 'desc' : 'asc'),
-      globalFilter,
-      currencyFilter,
-      accountNameFilter
-    }),
+    queryKey: ["financials", pageIndex, pageSize, sortBy],
+    queryFn: () =>
+      getFinancialData({
+        page: pageIndex + 1, // API pages are usually 1-based
+        size: pageSize,
+        sortBy: sortBy.id,
+        sortDirection:
+          sortBy.desc === null ? null : sortBy.desc ? "desc" : "asc",
+        globalFilter,
+        currencyFilter,
+        accountNameFilter,
+      }),
     retry: false,
     keepPreviousData: true,
   });
@@ -62,7 +54,7 @@ const FinancialsTable = () => {
     mutationFn: (id) => deleteFinancialData(id),
     onSuccess: () => {
       toast.success("Record Deleted Successfully");
-      queryClient.invalidateQueries('financials');
+      queryClient.invalidateQueries("financials");
       closeModal();
     },
     onError: (error) => {
@@ -71,55 +63,9 @@ const FinancialsTable = () => {
   });
 
   useEffect(() => {
-    // console.log("useEffect accountNameFilter: ", accountNameFilter);
     refetch();
     console.log("data inside useEffect: ", fetchedData);
-  }, [pageIndex, pageSize, sortBy, globalFilter, refetch, currencyFilter, accountNameFilter]);
-
-  const handleSortChange = (columnId) => {
-    let newSortBy;
-    if (sortBy.id === columnId) {
-      if (sortBy.desc === null) {
-        // Current state is default, move to ascending
-        newSortBy = { id: columnId, desc: false };
-      } else if (!sortBy.desc) {
-        // Current state is ascending, move to descending
-        newSortBy = { id: columnId, desc: true };
-      } else {
-        // Current state is descending, move to default
-        newSortBy = { id: null, desc: null };
-      }
-    } else {
-      // Sort by a new column, default to ascending
-      newSortBy = { id: columnId, desc: false };
-    }
-    setSortBy(newSortBy);
-    setPageIndex(0); // Reset to the first page when sorting changes
-  };
-
-  const handlePageSizeChange = (newPageSize) => {
-    // console.log("handlePagesizeChange newPageSize: ", newPageSize);
-    setPageSize(newPageSize);
-    setPageIndex(0); // Reset to the first page when page size changes
-  };
-
-  const handleCurrencyChange = (newCurrency) => {
-    setCurrencyFilter(newCurrency);
-    setPageIndex(0); // Reset to the first page when page size changes
-  };
-
-  const handleAccountNameChange = (newAccountName) => {
-    setAccountNameFilter(newAccountName);
-    setPageIndex(0); // Reset to the first page when page size changes
-  };
-
-  const handleGlobalFilterChange = (value) => {
-    setGlobalFilter(value);
-  };
-
-  const gotoPage = (pageIndex) => {
-    setPageIndex(pageIndex);
-  };
+  }, [ pageIndex, pageSize, sortBy, globalFilter, refetch, currencyFilter, accountNameFilter]);
 
   return (
     <div className="flex flex-col gap-4 ">
@@ -129,8 +75,7 @@ const FinancialsTable = () => {
           globalFilter={globalFilter}
           setGlobalFilter={handleGlobalFilterChange}
         />
-        <div className='flex gap-4'>
-
+        <div className="flex gap-4">
           <AccountNameFilter
             className="sm:w-64"
             accountNameFilter={accountNameFilter}
@@ -182,9 +127,13 @@ const FinancialsTable = () => {
           />
 
           <Modal isOpen={isModalOpen} onClose={closeModal}>
-            {modalType === 'add' && <AddFinancial onClose={closeModal} />}
-            {modalType === 'edit' && selectedRow && <EditFinancial data={selectedRow} onClose={closeModal} />}
-            {modalType === 'view' && selectedRow && <ViewFinancial data={selectedRow} onClose={closeModal} />}
+            {modalType === "add" && <AddFinancial onClose={closeModal} />}
+            {modalType === "edit" && selectedRow && (
+              <EditFinancial data={selectedRow} onClose={closeModal} />
+            )}
+            {modalType === "view" && selectedRow && (
+              <ViewFinancial data={selectedRow} onClose={closeModal} />
+            )}
           </Modal>
 
           <div className="flex justify-between">
@@ -219,7 +168,3 @@ export const Financials = () => {
     </div>
   );
 };
-
-
-
-

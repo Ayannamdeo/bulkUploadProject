@@ -59,9 +59,10 @@ class BulkUploadReportRepository {
         this.getBulkUploadReportByUploadId = (id) => __awaiter(this, void 0, void 0, function* () {
             return yield models_2.BULK_UPLOAD_REPORT.findOne({ uploadId: id });
         });
-        // public deleteBulkUploadReport = async (id: string):Promise<any> => {
-        //   return await BULK_UPLOAD_REPORT.findByIdAndDelete(id);
-        // }
+        this.deleteBulkUploadReport = (id) => __awaiter(this, void 0, void 0, function* () {
+            console.log("inside bulkuploadrepository deleteBulkUploadReport");
+            return yield models_2.BULK_UPLOAD_REPORT.deleteMany({ uploadId: id });
+        });
         this.getAllUploadReport = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, sortBy = "createdAt", sortDirection = "desc") {
             const offset = (page - 1) * limit;
             const documentCount = yield models_2.BULK_UPLOAD_REPORT.countDocuments();
@@ -84,7 +85,9 @@ class BulkErrorRepository {
         });
         this.getAllErrorReport = (...args_1) => __awaiter(this, [...args_1], void 0, function* (page = 1, limit = 10, logId) {
             const offset = (page - 1) * limit;
-            const documentCount = yield models_3.BULK_ERROR_REPORT.countDocuments({ uploadId: logId });
+            const documentCount = yield models_3.BULK_ERROR_REPORT.countDocuments({
+                uploadId: logId,
+            });
             // console.log( "inside bulkErrorReport Repository documentCounts: ", documentCount,);
             const data = yield models_3.BULK_ERROR_REPORT.find({ uploadId: logId })
                 .skip(offset)

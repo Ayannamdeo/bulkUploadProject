@@ -41,7 +41,9 @@ class FinancialServices {
     );
   };
 
-  findBulkUploadReportByUploadId = async ( id: string,): Promise<IBulkUpload | null> => {
+  findBulkUploadReportByUploadId = async (
+    id: string,
+  ): Promise<IBulkUpload | null> => {
     return await this.bulkUploadReportRepository.getBulkUploadReportByUploadId(
       id,
     );
@@ -62,7 +64,10 @@ class FinancialServices {
     }
   };
 
-  UpdateFinancials = async ( id: string, data: any,): Promise<IFinance | string[] | null> => {
+  UpdateFinancials = async (
+    id: string,
+    data: any,
+  ): Promise<IFinance | string[] | null> => {
     const keysToFilter = ["_id", "__v", "createdAt", "updatedAt"];
     const filteredData = Object.keys(data).reduce((acc: any, key) => {
       if (!keysToFilter.includes(key)) {
@@ -92,7 +97,8 @@ class FinancialServices {
   deleteBulk = async (id: string): Promise<any> => {
     const r1 = await this.bulkErrorRepository.deleteAllErrorReports(id);
     const r2 = await this.financialRepository.deleteManyRecords(id);
-    return { r1, r2 };
+    const r3 = await this.bulkUploadReportRepository.deleteBulkUploadReport(id);
+    return { r1, r2, r3 };
   };
 
   countAllFinancials = async (): Promise<number> => {
@@ -105,7 +111,10 @@ class FinancialServices {
 
     // Extract search results and count from the response
     const searchResults = response.searchResults || [];
-    const totalDocuments = response.countResults.length > 0 ? response.countResults[0].totalDocuments : 0;
+    const totalDocuments =
+      response.countResults.length > 0
+        ? response.countResults[0].totalDocuments
+        : 0;
 
     return { searchResults, totalDocuments };
   };
@@ -132,7 +141,10 @@ class FinancialServices {
     return await this.bulkErrorRepository.getAllErrorReport(page, limit, logId);
   };
 
-  private static transformEntry = ( csvRowData: any, uploadId: string,): IFinance => {
+  private static transformEntry = (
+    csvRowData: any,
+    uploadId: string,
+  ): IFinance => {
     const transformedRow = {
       uploadId: uploadId,
       name: csvRowData.name,
@@ -152,7 +164,10 @@ class FinancialServices {
     return transformedRow;
   };
 
-  private static validateEntries = async ( entries: IFinance[], uploadId: string): Promise<{ passed: IFinance[]; failed: IBulkError[] }> => {
+  private static validateEntries = async (
+    entries: IFinance[],
+    uploadId: string,
+  ): Promise<{ passed: IFinance[]; failed: IBulkError[] }> => {
     const passed: IFinance[] = [];
     const failed: IBulkError[] = [];
 
@@ -175,9 +190,15 @@ class FinancialServices {
     return { passed, failed };
   };
 
-  private processInBatch = async ( batch: IFinance[], uploadId: string): Promise<{ passedCount: number; failedCount: number }> => {
+  private processInBatch = async (
+    batch: IFinance[],
+    uploadId: string,
+  ): Promise<{ passedCount: number; failedCount: number }> => {
     try {
-      const { passed, failed } = await FinancialServices.validateEntries( batch, uploadId);
+      const { passed, failed } = await FinancialServices.validateEntries(
+        batch,
+        uploadId,
+      );
       await this.financialRepository.uploadCsv(passed);
       if (failed.length > 0) {
         await this.bulkErrorRepository.uploadErrors(failed);
@@ -190,7 +211,12 @@ class FinancialServices {
     }
   };
 
-  uploadCsvFile = async ( fileName: string, filePath: string, fileSize: string, userEmail: string): Promise<string> => {
+  uploadCsvFile = async (
+    fileName: string,
+    filePath: string,
+    fileSize: string,
+    userEmail: string,
+  ): Promise<string> => {
     return new Promise((resolve, reject) => {
       const batchSize = 10000;
       let currentBatch: IFinance[] = [];
@@ -215,12 +241,18 @@ class FinancialServices {
           reject(error);
         })
         .on("data", async (row) => {
-          const transformedData = FinancialServices.transformEntry( row, uploadId);
+          const transformedData = FinancialServices.transformEntry(
+            row,
+            uploadId,
+          );
           currentBatch.push(transformedData);
 
           if (currentBatch.length >= batchSize) {
             csvStream.pause();
-            const { passedCount, failedCount } = await this.processInBatch( currentBatch, uploadId);
+            const { passedCount, failedCount } = await this.processInBatch(
+              currentBatch,
+              uploadId,
+            );
             successfulEntries += passedCount;
             failedEntries += failedCount;
             currentBatch = [];
@@ -230,7 +262,10 @@ class FinancialServices {
         .on("end", async (rowCount: number) => {
           const totalEntries = rowCount;
           if (currentBatch.length > 0) {
-            const { passedCount, failedCount } = await this.processInBatch( currentBatch, uploadId);
+            const { passedCount, failedCount } = await this.processInBatch(
+              currentBatch,
+              uploadId,
+            );
             successfulEntries += passedCount;
             failedEntries += failedCount;
           }

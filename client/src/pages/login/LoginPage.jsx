@@ -82,8 +82,9 @@ export function LoginPage() {
                 },
               })}
               placeholder="Enter Email "
-              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${errors.email ? "border-red-500" : "border-[#c3cad9]"
-                } `}
+              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${
+                errors.email ? "border-red-500" : "border-[#c3cad9]"
+              } `}
             />
             {errors.email?.message && (
               <p className="text-red-500 text-xs mt-1 ">
@@ -119,8 +120,9 @@ export function LoginPage() {
                 },
               })}
               placeholder="Enter Password "
-              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${errors.password ? "border-red-500" : "border-[#c3cad9]"
-                } `}
+              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${
+                errors.password ? "border-red-500" : "border-[#c3cad9]"
+              } `}
             />
             {errors.password?.message && (
               <p className="text-red-500 text-xs mt-1 ">
@@ -138,7 +140,7 @@ export function LoginPage() {
           </button>
 
           <p className="text-sm font-semibold text-[#5a7184]">
-            Don't have an account
+            Do not have an account?
             <Link to="/register" className="text-blue-600">
               {"  "}Register
             </Link>

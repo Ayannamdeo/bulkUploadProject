@@ -3,9 +3,7 @@ import { useForm } from "react-hook-form";
 import { useMutation } from "@tanstack/react-query";
 import toast from "react-hot-toast";
 
-import { MainLayout } from "../../layouts/MainLayout";
 import { signup } from "../../services/user";
-// import { useEffect } from "react";
 
 export function RegisterPage() {
   const navigate = useNavigate();
@@ -22,7 +20,7 @@ export function RegisterPage() {
     onError: (error) => {
       toast.error(error.message);
       console.log(error);
-    }
+    },
   });
 
   // useEffect(()=>{ // condition rather than useEffect
@@ -77,8 +75,9 @@ export function RegisterPage() {
                 },
               })}
               placeholder="Enter Name"
-              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${errors.name ? "border-red-500" : "border-[#c3cad9]"
-                } `}
+              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${
+                errors.name ? "border-red-500" : "border-[#c3cad9]"
+              } `}
             />
             {errors.name?.message && (
               <p className="text-red-500 text-xs mt-1 ">
@@ -109,8 +108,9 @@ export function RegisterPage() {
                 },
               })}
               placeholder="Enter Email "
-              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${errors.email ? "border-red-500" : "border-[#c3cad9]"
-                } `}
+              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${
+                errors.email ? "border-red-500" : "border-[#c3cad9]"
+              } `}
             />
             {errors.email?.message && (
               <p className="text-red-500 text-xs mt-1 ">
@@ -146,8 +146,9 @@ export function RegisterPage() {
                 },
               })}
               placeholder="Enter Password "
-              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${errors.password ? "border-red-500" : "border-[#c3cad9]"
-                } `}
+              className={`placeholder:text-[#959ead]  mt-3 rounded-lg p-4 font-semibold block outline-none border ${
+                errors.password ? "border-red-500" : "border-[#c3cad9]"
+              } `}
             />
             {errors.password?.message && (
               <p className="text-red-500 text-xs mt-1 ">
@@ -165,7 +166,7 @@ export function RegisterPage() {
           </button>
 
           <p className="text-sm font-semibold text-[#5a7184]">
-            You have an account?{" "}
+            Already have an account?{" "}
             <Link to="/login" className="text-blue-600">
               {" "}
               Login now

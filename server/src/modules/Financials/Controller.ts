@@ -3,7 +3,6 @@ import { Request, Response, response } from "express";
 import { logger } from "../../lib/helpers/logger";
 import { formatFileSize } from "../../lib/helpers/formatFileSize";
 import { FinancialServices } from "./Services";
-import { IFinance } from "./entities";
 
 class FinancialControllers {
   private readonly financialServices: FinancialServices;

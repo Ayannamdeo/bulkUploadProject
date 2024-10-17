@@ -1,28 +1,33 @@
-import { Link } from "react-router-dom";
-import { isAuthenticated } from "../../../utils/helpers/auth";
+import { useNavigate } from "react-router-dom";
 
 export function Hero() {
-  // const isAuth = isAuthenticated();
-
+  const navigate = useNavigate();
   return (
-    <div className="p-8">
-      <h1>Welcome this HomePage</h1>
+    <div className="p-8 text-center">
+      <h1 className="text-4xl font-bold mb-4">Welcome to Gridify</h1>
+      <p className="text-lg text-gray-700">
+        Easily upload, validate, and manage your data with our seamless CSV
+        handling platform.
+      </p>
+      <p className="text-md mt-4 text-gray-600">
+        Ready to get started? Upload your CSV files and view detailed records
+        with advanced sorting, filtering, and editing options.
+      </p>
+      <div className="mt-6">
+        <button
+          onClick={() => navigate("/uploadfile")}
+          className="bg-blue-gray-700 text-white py-2 px-4 rounded-lg shadow hover:bg-blue-gray-600"
+        >
+          Get Started with CSV Upload
+        </button>
+      </div>
     </div>
   );
 }
-
-
-// <div className="bg-gradient-to-tr from-[#ff80b5] to-[#9089fc] py-52 px-8 relative overflow-hidden">
-//
-//   <div className="max-w-2xl mx-auto text-center">
-//     <h1 className="font-bold text-white mb-6 text-6xl">Bulk Upload Project</h1>
-//     <p className="text-gray-100 leading-8 mb-10 text-xl">
-//       Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat aliqua.
-//     </p>
-//     <div className="flex justify-center gap-6">
-//       <Link to={isAuth ? "/blogs" : "/login"} className="bg-indigo-600 text-white px-6 py-3 rounded-md font-semibold hover:bg-indigo-500 transition-colors duration-300">
-//         Get started
-//       </Link>
+// export function Hero() {
+//   return (
+//     <div className="p-8">
+//       <h1>Welcome this HomePage</h1>
 //     </div>
-//   </div>
-// </div>
+//   );
+// }

@@ -1,6 +1,9 @@
 import axios from "axios";
 import { getToken } from "../utils/helpers/auth";
 
+const API_URL = import.meta.env.VITE_API_URL;
+console.log(API_URL);
+
 export const getFinancialData = async ({
   page = 0,
   size = 10,
@@ -11,20 +14,15 @@ export const getFinancialData = async ({
   accountNameFilter = "",
 }) => {
   try {
-    console.log("inside getFinancialData");
-    const token = getToken();
-    // console.log("globalFilter");
     if (
       globalFilter !== "" ||
       currencyFilter !== "" ||
       accountNameFilter !== ""
     ) {
-      console.log("inside if block");
-      console.log("currency Filter inside frontend service", currencyFilter);
       const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        // headers: {
+        //   Authorization: `Bearer ${token}`,
+        // },
         params: {
           page,
           size,
@@ -36,19 +34,16 @@ export const getFinancialData = async ({
         },
       };
 
-      const { data } = await axios.get(
-        "http://localhost:3000/api/financials/search",
-        config,
-      );
+      const { data } = await axios.get(`${API_URL}/financials/search`, config);
 
       console.log("data from getFinancialData wiht globalFilter", data);
       return data;
     } else {
       console.log("inside else block");
       const config = {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        // headers: {
+        //   Authorization: `Bearer ${token}`,
+        // },
         params: {
           page,
           size,
@@ -57,10 +52,7 @@ export const getFinancialData = async ({
         },
       };
 
-      const { data } = await axios.get(
-        "http://localhost:3000/api/financials/",
-        config,
-      );
+      const { data } = await axios.get(`${API_URL}/financials/`, config);
 
       console.log("data from getFinancialData", data);
       return data;
@@ -84,10 +76,7 @@ export const deleteFinancialData = async (id) => {
       },
     };
 
-    const { data } = await axios.delete(
-      `http://localhost:3000/api/financials/${id}`,
-      config,
-    );
+    const { data } = await axios.delete(`${API_URL}/financials/${id}`, config);
 
     console.log("data from getFinancialData", data);
     return data;
@@ -112,7 +101,7 @@ export const createFinancialData = async (newData) => {
     };
 
     const { data } = await axios.post(
-      `http://localhost:3000/api/financials/`,
+      `${API_URL}/financials/`,
       newData,
       config,
     );
@@ -139,7 +128,7 @@ export const updateFinancialData = async (id, updatedData) => {
     };
 
     const { data } = await axios.patch(
-      `http://localhost:3000/api/financials/${id}`,
+      `${API_URL}/financials/${id}`,
       updatedData,
       config,
     );

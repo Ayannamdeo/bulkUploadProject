@@ -4,11 +4,10 @@ import { ReactPortal } from "../utils/helpers/reactPortal";
 
 const Modal = ({ isOpen, onClose, children }) => {
   useEffect(() => {
-    const close_on_escape = e => e.key === "Escape" ? onClose() : null;
+    const close_on_escape = (e) => (e.key === "Escape" ? onClose() : null);
     document.addEventListener("keydown", close_on_escape);
 
     return () => document.removeEventListener("keydown", close_on_escape);
-
   }, [onClose]);
 
   if (!isOpen) return null;
@@ -16,8 +15,14 @@ const Modal = ({ isOpen, onClose, children }) => {
 
   return (
     <ReactPortal>
-      <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50" onClick={onClose}>
-        <div className="" onClick={e => e.stopPropagation()}>
+      <div
+        className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50"
+        onClick={onClose}
+      >
+        <div
+          className="max-h-screen overflow-y-scroll"
+          onClick={(e) => e.stopPropagation()}
+        >
           {children}
         </div>
       </div>

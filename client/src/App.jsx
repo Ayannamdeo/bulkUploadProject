@@ -28,12 +28,15 @@ function App() {
         <Routes>
           <Route element={<MainLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/table" element={<Financials />} />
+            <Route path="/filereport" element={<FileReport />} />
+            <Route path="/errorreport/:logId" element={<ErrorReport />} />
 
             <Route element={<Privateroutes />}>
-              <Route path="/table" element={<Financials />} />
+              {/* <Route path="/table" element={<Financials />} /> */}
               <Route path="/uploadfile" element={<UploadFile />} />
-              <Route path="/filereport" element={<FileReport />} />
-              <Route path="/errorreport/:logId" element={<ErrorReport />} />
+              {/* <Route path="/filereport" element={<FileReport />} /> */}
+              {/* <Route path="/errorreport/:logId" element={<ErrorReport />} /> */}
             </Route>
           </Route>
 
