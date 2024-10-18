@@ -5,7 +5,6 @@ const API_URL = import.meta.env.VITE_API_URL;
 
 export const getErrorReportData = async ({ page = 0, size = 10, logId }) => {
   try {
-    console.log("inside getErrorReportData");
     // const token = getToken();
     const config = {
       // headers: {
@@ -23,7 +22,6 @@ export const getErrorReportData = async ({ page = 0, size = 10, logId }) => {
       config,
     );
 
-    console.log("data from getErrorReportData", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {

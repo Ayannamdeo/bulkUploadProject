@@ -1,5 +1,6 @@
 import express, { Application } from "express";
 import cookieParser from "cookie-parser";
+import compression from "compression";
 // import helmet from "helmet";
 import cors from "cors";
 // import { exec } from "child_process";
@@ -41,6 +42,7 @@ class Server {
   }
 
   private configureMiddlewares(): void {
+    this.app.use(compression());
     this.app.use(ReqLoggger.LogHTTP);
     this.app.use(cors());
     // this.app.use(helmet());

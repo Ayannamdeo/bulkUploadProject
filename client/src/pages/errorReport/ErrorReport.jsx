@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useParams } from "react-router-dom";
 
@@ -37,7 +37,6 @@ const ErrorReportTable = () => {
   });
   useEffect(() => {
     refetch();
-    // console.log("data inside useEffect: ", fetchedData);
   }, [pageIndex, pageSize, refetch]);
 
   return (
@@ -74,10 +73,14 @@ const ErrorReportTable = () => {
   );
 };
 
-export const ErrorReport = () => {
+const ErrorReport = () => {
   return (
     <div className="grid max-w-screen-xl justify-center items-center  overflow-auto my-4 py-4 sm:py-0">
       <ErrorReportTable />
     </div>
   );
 };
+
+const MemoizedErrorReport = React.memo(ErrorReport);
+
+export { MemoizedErrorReport as ErrorReport };

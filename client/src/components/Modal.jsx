@@ -11,7 +11,6 @@ const Modal = ({ isOpen, onClose, children }) => {
   }, [onClose]);
 
   if (!isOpen) return null;
-  console.log("modal opened !!!!!");
 
   return (
     <ReactPortal>

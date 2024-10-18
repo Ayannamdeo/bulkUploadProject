@@ -13,13 +13,11 @@ export function RegisterPage() {
       return signup({ name, email, password });
     },
     onSuccess: (data) => {
-      console.log(data);
       // localStorage.setItem("")
       navigate("/login");
     },
     onError: (error) => {
       toast.error(error.message);
-      console.log(error);
     },
   });
 
@@ -29,7 +27,6 @@ export function RegisterPage() {
   // })
 
   const submitHandler = (data) => {
-    console.log(data);
     const { name, email, password } = data;
     mutate({ name, email, password });
   };

@@ -26,7 +26,6 @@ export const login = async ({ email, password }) => {
       email,
       password,
     });
-    console.log("data after login", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
@@ -37,4 +36,3 @@ export const login = async ({ email, password }) => {
     throw new Error(error.message);
   }
 };
-

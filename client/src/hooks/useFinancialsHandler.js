@@ -33,7 +33,6 @@ const useFinancialsHandler = () => {
   );
 
   const handlePageSizeChange = useCallback((newPageSize) => {
-    // console.log("handlePagesizeChange newPageSize: ", newPageSize);
     setPageSize(newPageSize);
     setPageIndex(0); // Reset to the first page when page size changes
   }, []);

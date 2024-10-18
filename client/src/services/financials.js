@@ -2,7 +2,6 @@ import axios from "axios";
 import { getToken } from "../utils/helpers/auth";
 
 const API_URL = import.meta.env.VITE_API_URL;
-console.log(API_URL);
 
 export const getFinancialData = async ({
   page = 0,
@@ -36,10 +35,8 @@ export const getFinancialData = async ({
 
       const { data } = await axios.get(`${API_URL}/financials/search`, config);
 
-      console.log("data from getFinancialData wiht globalFilter", data);
       return data;
     } else {
-      console.log("inside else block");
       const config = {
         // headers: {
         //   Authorization: `Bearer ${token}`,
@@ -54,7 +51,6 @@ export const getFinancialData = async ({
 
       const { data } = await axios.get(`${API_URL}/financials/`, config);
 
-      console.log("data from getFinancialData", data);
       return data;
     }
   } catch (error) {
@@ -78,7 +74,6 @@ export const deleteFinancialData = async (id) => {
 
     const { data } = await axios.delete(`${API_URL}/financials/${id}`, config);
 
-    console.log("data from getFinancialData", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
@@ -91,7 +86,6 @@ export const deleteFinancialData = async (id) => {
 };
 
 export const createFinancialData = async (newData) => {
-  console.log("newData iside createFinancilData:", newData);
   try {
     const token = getToken();
     const config = {
@@ -106,7 +100,6 @@ export const createFinancialData = async (newData) => {
       config,
     );
 
-    console.log("data from getFinancialData", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
@@ -118,7 +111,6 @@ export const createFinancialData = async (newData) => {
   }
 };
 export const updateFinancialData = async (id, updatedData) => {
-  console.log("formData iside updateFinancilData:", updatedData);
   try {
     const token = getToken();
     const config = {
@@ -133,7 +125,6 @@ export const updateFinancialData = async (id, updatedData) => {
       config,
     );
 
-    console.log("data from getFinancialData", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {

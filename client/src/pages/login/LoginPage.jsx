@@ -17,8 +17,6 @@ export function LoginPage() {
       return login({ email, password });
     },
     onSuccess: (data) => {
-      console.log(data);
-
       localStorage.setItem("userName", data.name);
       localStorage.setItem("userEmail", data.email);
       localStorage.setItem("userId", data.id);
@@ -30,13 +28,11 @@ export function LoginPage() {
       navigate("/table");
     },
     onError: (error) => {
-      console.log(error);
       toast.error(error.message);
     },
   });
 
   const submitHandler = (data) => {
-    console.log("inside submitHandler of login button", data);
     const { email, password } = data;
     mutate({ email, password });
   };

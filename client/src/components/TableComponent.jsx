@@ -1,19 +1,18 @@
 import { FaSortUp, FaSortDown } from "react-icons/fa";
 
-export function TableComponent({ columns, data, sortBy, onSortChange, }) {
-  console.log("inside tableComponent columns: ", columns);
-  console.log("inside tableComponent data: ", data);
-  // console.log("inside tableComponent onSortChange: ", onSortChange);
+export function TableComponent({ columns, data, sortBy, onSortChange }) {
   return (
     <div className="w-full min-w-[30rem] p-4 bg-white rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.03)]">
       <table>
-        <thead >
+        <thead>
           <tr className="">
             {columns.map((column) => (
               <th
                 key={column.accessor}
-                onClick={() => !column.disableSortBy && onSortChange(column.accessor)}
-                className={`px-3 text-start text-xs font-bold uppercase cursor-pointer hover:bg-gray-100 hover:rounded-lg ${column.disableSortBy ? '' : 'sorting'}`}
+                onClick={() =>
+                  !column.disableSortBy && onSortChange(column.accessor)
+                }
+                className={`px-3 text-start text-xs font-bold uppercase cursor-pointer hover:bg-gray-100 hover:rounded-lg ${column.disableSortBy ? "" : "sorting"}`}
                 style={{ width: column.width }}
               >
                 <div className="flex gap-2 items-center">
@@ -22,8 +21,12 @@ export function TableComponent({ columns, data, sortBy, onSortChange, }) {
                     <div className="flex flex-col">
                       {sortBy.id === column.accessor && (
                         <>
-                          <FaSortUp className={`text-sm translate-y-1/2 ${!sortBy.desc ? "text-blue-gray-500" : "text-gray-300"}`} />
-                          <FaSortDown className={`text-sm -translate-y-1/2 ${sortBy.desc ? "text-blue-gray-500" : "text-gray-300"}`} />
+                          <FaSortUp
+                            className={`text-sm translate-y-1/2 ${!sortBy.desc ? "text-blue-gray-500" : "text-gray-300"}`}
+                          />
+                          <FaSortDown
+                            className={`text-sm -translate-y-1/2 ${sortBy.desc ? "text-blue-gray-500" : "text-gray-300"}`}
+                          />
                         </>
                       )}
                       {sortBy.id !== column.accessor && (
@@ -55,7 +58,10 @@ export function TableComponent({ columns, data, sortBy, onSortChange, }) {
             ))
           ) : (
             <tr>
-              <td colSpan={columns.length} className="p-3 text-center text-sm font-normal text-gray-700">
+              <td
+                colSpan={columns.length}
+                className="p-3 text-center text-sm font-normal text-gray-700"
+              >
                 No data present
               </td>
             </tr>
@@ -65,4 +71,3 @@ export function TableComponent({ columns, data, sortBy, onSortChange, }) {
     </div>
   );
 }
-

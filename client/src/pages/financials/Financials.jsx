@@ -1,12 +1,27 @@
-import { useMemo, useEffect } from "react";
+import React, { useMemo, useEffect } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 
 import { getColumns } from "./container/getColumns";
-import { GlobalSearch, CurrencyFilter, AccountNameFilter, AddFinancial, EditFinancial, ViewFinancial, } from "./container";
-import { Modal, TableComponent, PageSizeMenu, PaginationNav, } from "../../components";
-import { getFinancialData, deleteFinancialData, } from "../../services/financials";
+import {
+  GlobalSearch,
+  CurrencyFilter,
+  AccountNameFilter,
+  AddFinancial,
+  EditFinancial,
+  ViewFinancial,
+} from "./container";
+import {
+  Modal,
+  TableComponent,
+  PageSizeMenu,
+  PaginationNav,
+} from "../../components";
+import {
+  getFinancialData,
+  deleteFinancialData,
+} from "../../services/financials";
 import { useModal } from "../../hooks/useModal";
 import { useFinancialsHandler } from "../../hooks/useFinancialsHandler";
 import { isAuthenticated } from "../../utils/helpers/auth";
@@ -15,25 +30,53 @@ const FinancialsTable = () => {
   const queryClient = useQueryClient();
   const navigate = useNavigate();
 
-  const { selectedRow, isModalOpen, closeModal, handleAdd, handleView, handleEdit, modalType, } = useModal();
-  const { handleGlobalFilterChange, handleSortChange, handleCurrencyChange, handlePageSizeChange, handleAccountNameChange,
-    gotoPage, pageIndex, pageSize, globalFilter, currencyFilter, accountNameFilter, sortBy } = useFinancialsHandler();
+  const {
+    selectedRow,
+    isModalOpen,
+    closeModal,
+    handleAdd,
+    handleView,
+    handleEdit,
+    modalType,
+  } = useModal();
+  const {
+    handleGlobalFilterChange,
+    handleSortChange,
+    handleCurrencyChange,
+    handlePageSizeChange,
+    handleAccountNameChange,
+    gotoPage,
+    pageIndex,
+    pageSize,
+    globalFilter,
+    currencyFilter,
+    accountNameFilter,
+    sortBy,
+  } = useFinancialsHandler();
 
   const handleDelete = (row) => {
     const isAuth = isAuthenticated();
-    if (!isAuth){
+    if (!isAuth) {
       //redirect user to login page
       toast.error("Please login to perform  this action.");
       navigate("/login");
       return;
     }
-    console.log("Deleting row: ", row);
     deleteMutation.mutate(row._id);
   };
 
-  const columns = useMemo(() => getColumns(handleView, handleEdit, handleDelete), []);
+  const columns = useMemo(
+    () => getColumns(handleView, handleEdit, handleDelete),
+    [],
+  );
 
-  const { data: fetchedData, isLoading, isError, error, refetch } = useQuery({
+  const {
+    data: fetchedData,
+    isLoading,
+    isError,
+    error,
+    refetch,
+  } = useQuery({
     queryKey: ["financials", pageIndex, pageSize, sortBy],
     queryFn: () =>
       getFinancialData({
@@ -64,8 +107,15 @@ const FinancialsTable = () => {
 
   useEffect(() => {
     refetch();
-    console.log("data inside useEffect: ", fetchedData);
-  }, [ pageIndex, pageSize, sortBy, globalFilter, refetch, currencyFilter, accountNameFilter]);
+  }, [
+    pageIndex,
+    pageSize,
+    sortBy,
+    globalFilter,
+    refetch,
+    currencyFilter,
+    accountNameFilter,
+  ]);
 
   return (
     <div className="flex flex-col gap-4 ">
@@ -161,10 +211,14 @@ const FinancialsTable = () => {
   );
 };
 
-export const Financials = () => {
+const Financials = () => {
   return (
     <div className=" max-w-screen-xl justify-center items-center  overflow-visible  my-4 py-4 sm:py-0">
       <FinancialsTable />
     </div>
   );
 };
+
+const MemoizedFinancials = React.memo(Financials);
+
+export { MemoizedFinancials as Financials };

@@ -1,4 +1,4 @@
-import { useMemo, useEffect, useState, useCallback } from "react";
+import React, { useMemo, useEffect, useState, useCallback } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -27,13 +27,11 @@ const FileReportTable = () => {
       navigate("/login");
       return;
     }
-    console.log("Deleting row: ", row);
     setIsDeleting(true);
     deleteMutation.mutate(row.uploadId);
   }, []);
 
   const handleView = useCallback((row) => {
-    console.log("viewing row: ", row);
     const logId = row.uploadId;
     navigate(`/errorreport/${logId}`);
   }, []);
@@ -116,10 +114,14 @@ const FileReportTable = () => {
   );
 };
 
-export const FileReport = () => {
+const FileReport = () => {
   return (
     <div className="grid max-w-screen-xl justify-center items-center  overflow-auto my-4 py-4 sm:py-0">
       <FileReportTable />
     </div>
   );
 };
+
+const MemoizedFileReport = React.memo(FileReport);
+
+export { MemoizedFileReport as FileReport };

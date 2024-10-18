@@ -10,7 +10,6 @@ export const getFileReportData = async ({
   sortDirection = "desc",
 }) => {
   try {
-    console.log("inside getFileReportData");
     // const token = getToken();
     const config = {
       // headers: {
@@ -29,14 +28,11 @@ export const getFileReportData = async ({
       config,
     );
 
-    console.log("data from getFileReportData", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
-      console.error(error.response.data.message);
       throw new Error(error.response.data.message);
     }
-    console.error(error.message);
     throw new Error(error.message);
   }
 };
@@ -56,7 +52,6 @@ export const deleteAllFileData = async (uploadId) => {
       config,
     );
 
-    console.log("data from deleteAllFileData", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {

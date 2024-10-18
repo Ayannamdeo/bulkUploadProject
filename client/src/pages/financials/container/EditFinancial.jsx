@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
-import { updateFinancialData } from '../../../services/financials';
+import { updateFinancialData } from "../../../services/financials";
 
 export const EditFinancial = ({ data, onClose }) => {
   const [formData, setFormData] = useState(data);
@@ -11,14 +11,14 @@ export const EditFinancial = ({ data, onClose }) => {
   const mutation = useMutation({
     mutationFn: ({ id, updatedData }) => updateFinancialData(id, updatedData),
     onSuccess: () => {
-      queryClient.invalidateQueries('financials');
+      queryClient.invalidateQueries("financials");
       toast.success("Record Updated Successfully");
       onClose();
     },
     onError: (error) => {
-      console.error('Error updating financial record:', error);
+      console.error("Error updating financial record:", error);
       toast.error(`Error updating financial record: ${error}`);
-    }
+    },
   });
 
   const handleChange = (e) => {
@@ -31,26 +31,32 @@ export const EditFinancial = ({ data, onClose }) => {
 
   const handleSave = () => {
     const id = data._id;
-    console.log("formData iside handlSave:", formData);
     mutation.mutate({ id, updatedData: formData });
   };
 
   const filteredFields = Object.keys(formData).filter(
-    (key) => !['_id', '__v', 'createdAt', 'updatedAt'].includes(key)
+    (key) => !["_id", "__v", "createdAt", "updatedAt"].includes(key),
   );
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 w-screen max-w-4xl mx-4 sm:mx-auto">
-      <h2 className="text-xl font-semibold leading-7 text-gray-900">Edit Financial Record</h2>
-      <p className="mt-1 text-sm leading-6 text-gray-600">Edit the information of the selected financial record.</p>
+      <h2 className="text-xl font-semibold leading-7 text-gray-900">
+        Edit Financial Record
+      </h2>
+      <p className="mt-1 text-sm leading-6 text-gray-600">
+        Edit the information of the selected financial record.
+      </p>
       <div className="pb-2 border-b border-gray-900/10 mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
         {filteredFields.map((key) => (
           <div className="sm:col-span-1" key={key}>
-            <label htmlFor={key} className="block text-sm font-medium leading-6 text-gray-900 capitalize">
-              {key.replace(/([A-Z])/g, ' $1').trim()}
+            <label
+              htmlFor={key}
+              className="block text-sm font-medium leading-6 text-gray-900 capitalize"
+            >
+              {key.replace(/([A-Z])/g, " $1").trim()}
             </label>
             <div className="mt-2">
-              {key === 'transactionDescription' ? (
+              {key === "transactionDescription" ? (
                 <textarea
                   name={key}
                   id={key}
@@ -90,4 +96,3 @@ export const EditFinancial = ({ data, onClose }) => {
     </div>
   );
 };
-

@@ -1,24 +1,24 @@
-import { useState } from 'react';
+import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { toast } from "react-hot-toast";
 
-import { createFinancialData } from '../../../services/financials';
+import { createFinancialData } from "../../../services/financials";
 
 export const AddFinancial = ({ onClose }) => {
   const [formData, setFormData] = useState({
-    name: '',
-    age: '',
-    sex: '',
-    country: '',
-    city: '',
-    accountNumber: '',
-    accountName: '',
-    amount: '',
-    currencyName: '',
-    jobTitle: '',
-    phoneNumber: '',
-    companyName: '',
-    transactionDescription: ''
+    name: "",
+    age: "",
+    sex: "",
+    country: "",
+    city: "",
+    accountNumber: "",
+    accountName: "",
+    amount: "",
+    currencyName: "",
+    jobTitle: "",
+    phoneNumber: "",
+    companyName: "",
+    transactionDescription: "",
   });
 
   const queryClient = useQueryClient();
@@ -26,14 +26,14 @@ export const AddFinancial = ({ onClose }) => {
   const mutation = useMutation({
     mutationFn: (newData) => createFinancialData(newData),
     onSuccess: () => {
-      queryClient.invalidateQueries('financials');
+      queryClient.invalidateQueries("financials");
       toast.success("Record Created Successfully");
       onClose();
     },
     onError: (error) => {
-      console.error('Error creating financial record:', error);
+      console.error("Error creating financial record:", error);
       toast.error(`Error creating financial record: ${error}`);
-    }
+    },
   });
 
   const handleChange = (e) => {
@@ -45,22 +45,28 @@ export const AddFinancial = ({ onClose }) => {
   };
 
   const handleSave = () => {
-    console.log("formData inside handleSave:", formData);
     mutation.mutate(formData);
   };
 
   return (
     <div className="bg-white rounded-lg shadow-lg p-6 w-screen max-w-4xl mx-4 sm:mx-auto">
-      <h2 className="text-xl font-semibold leading-7 text-gray-900">Add Financial Record</h2>
-      <p className="mt-1 text-sm leading-6 text-gray-600">Enter the information for the new financial record.</p>
+      <h2 className="text-xl font-semibold leading-7 text-gray-900">
+        Add Financial Record
+      </h2>
+      <p className="mt-1 text-sm leading-6 text-gray-600">
+        Enter the information for the new financial record.
+      </p>
       <div className="pb-2 border-b border-gray-900/10 mt-6 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-2">
         {Object.keys(formData).map((key) => (
           <div className="sm:col-span-1" key={key}>
-            <label htmlFor={key} className="block text-sm font-medium leading-6 text-gray-900 capitalize">
-              {key.replace(/([A-Z])/g, ' $1').trim()}
+            <label
+              htmlFor={key}
+              className="block text-sm font-medium leading-6 text-gray-900 capitalize"
+            >
+              {key.replace(/([A-Z])/g, " $1").trim()}
             </label>
             <div className="mt-2">
-              {key === 'transactionDescription' ? (
+              {key === "transactionDescription" ? (
                 <textarea
                   name={key}
                   id={key}
@@ -100,4 +106,3 @@ export const AddFinancial = ({ onClose }) => {
     </div>
   );
 };
-

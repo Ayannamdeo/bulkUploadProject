@@ -15,6 +15,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Server = void 0;
 const express_1 = __importDefault(require("express"));
 const cookie_parser_1 = __importDefault(require("cookie-parser"));
+const compression_1 = __importDefault(require("compression"));
 // import helmet from "helmet";
 const cors_1 = __importDefault(require("cors"));
 const DB_Connection_1 = require("./lib/db/DB_Connection");
@@ -100,6 +101,7 @@ class Server {
         // this.configureErrorHandler();
     }
     configureMiddlewares() {
+        this.app.use((0, compression_1.default)());
         this.app.use(reqLogger_1.ReqLoggger.LogHTTP);
         this.app.use((0, cors_1.default)());
         // this.app.use(helmet());
