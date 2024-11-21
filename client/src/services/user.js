@@ -1,6 +1,7 @@
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
+console.log("user API_URL: ", API_URL);
 
 export const signup = async ({ name, email, password }) => {
   try {
@@ -9,6 +10,7 @@ export const signup = async ({ name, email, password }) => {
       email,
       password,
     });
+    console.log("data from register: ", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {
@@ -26,6 +28,7 @@ export const login = async ({ email, password }) => {
       email,
       password,
     });
+    console.log("data from login: ", data);
     return data;
   } catch (error) {
     if (error.response && error.response.data.message) {

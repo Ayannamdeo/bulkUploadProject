@@ -2,6 +2,7 @@ import axios from "axios";
 import { getToken } from "../utils/helpers/auth";
 
 const API_URL = import.meta.env.VITE_API_URL;
+console.log("uploadfile API_URL: ", API_URL);
 
 export const uploadFile = async (formData, userEmail) => {
   try {

@@ -2,6 +2,7 @@ import axios from "axios";
 import { getToken } from "../utils/helpers/auth";
 
 const API_URL = import.meta.env.VITE_API_URL;
+console.log("financials API_URL: ", API_URL);
 
 export const getFinancialData = async ({
   page = 0,

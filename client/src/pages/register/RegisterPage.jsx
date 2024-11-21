@@ -13,6 +13,7 @@ export function RegisterPage() {
       return signup({ name, email, password });
     },
     onSuccess: (data) => {
+      console.log(data);
       // localStorage.setItem("")
       navigate("/login");
     },

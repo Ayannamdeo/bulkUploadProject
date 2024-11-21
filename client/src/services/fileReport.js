@@ -2,6 +2,7 @@ import { getToken } from "../utils/helpers/auth";
 import axios from "axios";
 
 const API_URL = import.meta.env.VITE_API_URL;
+console.log("filereport API_URL: ", API_URL);
 
 export const getFileReportData = async ({
   page = 0,
