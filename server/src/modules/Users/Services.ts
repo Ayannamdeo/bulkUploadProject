@@ -43,7 +43,7 @@ class UserServices {
 
   static generateToken = (existingUser: IUser, jwtsecret: string) => {
     return JWT.sign(
-      { userId: existingUser.name, role: existingUser.role },
+      { userId: existingUser.email, role: existingUser.role },
       jwtsecret,
       {
         expiresIn: 60 * 15,

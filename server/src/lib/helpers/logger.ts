@@ -5,7 +5,7 @@ const logger = winston.createLogger({
   format: winston.format.combine(
     winston.format.timestamp(),
     winston.format.json(),
-    winston.format.prettyPrint()
+    winston.format.prettyPrint(),
   ),
   transports: [
     new winston.transports.Console(),
@@ -13,4 +13,5 @@ const logger = winston.createLogger({
   ],
 });
 
-export {logger};
+export { logger };
+

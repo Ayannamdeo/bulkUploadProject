@@ -1,7 +1,9 @@
 interface IBulkUpload {
+  userEmail: string;
+  fileSize: string;
   uploadId: string;
-  startTime: Date;
-  endTime: Date;
+  startTime: string;
+  endTime: string;
   fileName: string;
   totalEntries: number;
   successfulEntries: number;

@@ -1,12 +1,15 @@
-import { MainLayout } from "../../components";
+import React from "react";
+
 import { Hero } from "./container/Hero";
 
-export function HomePage() {
+const HomePage = () => {
   return (
     <>
-      <MainLayout>
-        <Hero />
-      </MainLayout>
+      <Hero />
     </>
   );
-}
+};
+
+const MemoizedHomePage = React.memo(HomePage);
+
+export { MemoizedHomePage as HomePage };
