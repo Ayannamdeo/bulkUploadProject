@@ -1,5 +1,5 @@
 /node_modules
+./server/dist
 .env
 app.log
-/public
-/uploads
+# TODO: /public/uploads  make the contents of uploads be ignored and not the directory itself
